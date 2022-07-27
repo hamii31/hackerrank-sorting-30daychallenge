@@ -6,7 +6,6 @@ class Solution {
         /* Enter your code here. Read input from STDIN. Print output to STDOUT. Your class should be named Solution */
         int n = int.Parse(Console.ReadLine());
         int i, x, input;
-        string print;
         for (i = 0; i < n; i++)
         {
             input = int.Parse(Console.ReadLine());
@@ -17,8 +16,14 @@ class Solution {
                     input = 1;
                 }
             }
-            print = input == 1 ? "Not prime" : "Prime";
-            Console.WriteLine(print);
+            if(input == 1)
+            {
+                Console.WriteLine("Not prime");
+            }
+            else
+            {
+                Console.WriteLine("Prime");
+            }
         }
     }
 }
