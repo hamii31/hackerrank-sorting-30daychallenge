@@ -1,0 +1,24 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+class Solution {
+    static void Main(String[] args) {
+        /* Enter your code here. Read input from STDIN. Print output to STDOUT. Your class should be named Solution */
+        int n = int.Parse(Console.ReadLine());
+        int i, x, input;
+        string print;
+        for (i = 0; i < n; i++)
+        {
+            input = int.Parse(Console.ReadLine());
+            for (x = 2; x <= input/x; x++)
+            {
+                if (input % x == 0)
+                {
+                    input = 1;
+                }
+            }
+            print = input == 1 ? "Not prime" : "Prime";
+            Console.WriteLine(print);
+        }
+    }
+}
