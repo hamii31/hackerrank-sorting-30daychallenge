@@ -5,11 +5,10 @@ class Solution {
     static void Main(String[] args) {
         /* Enter your code here. Read input from STDIN. Print output to STDOUT. Your class should be named Solution */
         int n = int.Parse(Console.ReadLine());
-        int i, x, input;
-        for (i = 0; i < n; i++)
+        for (int i = 0; i < n; i++)
         {
-            input = int.Parse(Console.ReadLine());
-            for (x = 2; x <= input/x; x++)
+            int input = int.Parse(Console.ReadLine());
+            for (int x = 2; x <= input/x; x++)
             {
                 if (input % x == 0)
                 {
