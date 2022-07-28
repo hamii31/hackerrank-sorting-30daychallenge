@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 
 class Solution
@@ -9,13 +7,9 @@ class Solution
     {
         /* Enter your code here. Read input from STDIN. Print output to STDOUT. Your class should be named Solution */
         int[] returndate = Console.ReadLine().Split(" ").Select(int.Parse).ToArray();
-        int day = returndate[0];
-        int month = returndate[1];
-        int year = returndate[2];
+        int day = returndate[0], month = returndate[1], year = returndate[2];
         int[] dueTo = Console.ReadLine().Split(" ").Select(int.Parse).ToArray();
-        int day1 = dueTo[0];
-        int month1 = dueTo[1];
-        int year1 = dueTo[2];
+        int day1 = dueTo[0], month1 = dueTo[1], year1 = dueTo[2];
 
         if (year == year1)
         {
