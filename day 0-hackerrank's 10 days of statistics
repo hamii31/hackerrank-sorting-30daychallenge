@@ -1,0 +1,40 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+class Solution
+{
+    static void Main(String[] args)
+    {
+        int n = int.Parse(Console.ReadLine());
+        var array = Console.ReadLine().Split(" ").Select(double.Parse).ToArray();
+        // mean
+        Console.WriteLine(array.Average());
+        // median
+        Array.Sort(array);
+        var middle = array.Length / 2;
+        if (array.Length % 2 == 0)
+        {
+            Console.WriteLine(Math.Round((array[middle] + array[middle - 1]) / 2, 1));
+        }
+        else
+        {
+            Console.WriteLine(Math.Round(array[middle], 1));
+        }
+        // mode
+        var count = new Dictionary<double, int>();
+        foreach (var item in array)
+        {
+            if (count.ContainsKey(item))
+            {
+                count[item] += 1;
+            }
+            else
+            {
+                count[item] = 1;
+            }
+        }
+        var highestCount = count.Max(p => p.Value);
+        Console.WriteLine(count.Where(p => p.Value == highestCount).OrderBy(p => p.Key).Select(p => p.Key).First());
+    }
+}
