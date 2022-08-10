@@ -26,7 +26,6 @@ class Result
     public static void weightedMean(int[] X, int[] W)
     {
 
-        // (x[i] * w[i]) +
         var sum1 = 0.0;
         for (int i = 0; i < X.Length; i++)
         {
