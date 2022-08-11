@@ -36,10 +36,6 @@ class Result
                 list.Add(values[0 + i]);
             }
         }
-        //if (list.Count % 2 != 0)
-        //{
-        //    list.RemoveAt(list.Count / 2);
-        //}
         var S = list.ToArray();
         Array.Sort(S);
         var Q1 = 0.0;
