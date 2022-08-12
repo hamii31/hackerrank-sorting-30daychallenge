@@ -1,0 +1,37 @@
+using System;
+using System.Linq;
+
+namespace compound_event_probability
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            var X = new string[] { "red", "red", "red", "red", "black", "black", "black" };
+            var Y = new string[] { "red", "red", "red", "red", "red", "black", "black", "black", "black" };
+            var Z = new string[] { "red", "red", "red", "red", "black", "black", "black", "black" };
+
+            var total = X.Length * Y.Length * Z.Length;
+
+            var totalPoaaibilites = 0;
+
+            for (int x = 0; x < X.Length; x++)
+            {
+                for (int y = 0; y < Y.Length; y++)
+                {
+                    for (int z = 0; z < Z.Length; z++)
+                    {
+                        if (X[x] == "black" && Y[y] == "red" && Z[z] == "red" 
+                            || X[x] == "red" && Y[y] == "black" && Z[z] == "red" 
+                            || X[x] == "red" && Y[y] == "red" && Z[z] == "black")
+                        {
+                            totalPoaaibilites++;
+                        }
+                    }
+                }
+            }
+            var possiblity = totalPoaaibilites / total;
+            Console.WriteLine("{0}/{1}", totalPoaaibilites, total, possiblity);
+        }
+    }
+}
