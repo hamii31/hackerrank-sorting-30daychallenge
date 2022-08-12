@@ -16,7 +16,7 @@ namespace basic_probability
             {
                 for (int r = 0; r < dice2.Length; r++)
                 {
-                    if ((dice1[i] + dice2[r]) <= 9)
+                    if ((dice1[i] + dice2[r]) <= 9) //find how many possibilities there are of 2 dice giving a sum lower or equal to 9
                     {
                         totalPossibilities++;
                     }
