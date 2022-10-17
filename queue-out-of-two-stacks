@@ -1,0 +1,50 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace Hackerrank
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            var stack1 = new Stack<int>();
+            var stack2 = new Stack<int>();
+
+            var Q = int.Parse(Console.ReadLine());
+            for (int i = 0; i < Q; i++)
+            {
+                var input = Console.ReadLine().Split(" ", StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToArray();
+                var command = input[0];
+                if (command == 1) // enqueue
+                {
+                    stack1.Push(input[1]);
+
+                    while (stack1.Count > 0)
+                    {
+                        stack2.Push(stack1.Pop());
+                    }
+
+                }
+                else if (command == 2) // dequeue
+                {
+                    while (stack2.Count > 0)
+                    {
+                        stack1.Push(stack2.Pop());
+                    }
+                    stack1.Pop();
+                    while (stack1.Count > 0)
+                    {
+                        stack2.Push(stack1.Pop());
+                    }
+                }
+                else if (command == 3) // print
+                {
+                    Console.WriteLine(stack2.Last());
+                }
+            }
+           
+         
+        }
+    }
+}
