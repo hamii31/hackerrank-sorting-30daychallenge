@@ -1,0 +1,63 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+
+class Solution
+{
+
+    static void Main(String[] args)
+    {
+        // prob = nCx * p^x * q^n-x
+        //x = 3,4,5,6
+        //n = 6
+        //p = 0.47..
+        // probabilities of 3/6, 4/6, 5/6, 6/6
+        var q = 1.0 / (1.0 + 1.09);
+        var p = 1.0 - q;
+
+        // probabilityA = 3 boys / 6 kids -> n = 6; x = 3;
+        var nA = 1;
+        var xA = 1;
+        for (int i = 1; i <= 6; i++)
+        {
+            nA *= i;
+        }
+        for (int i = 1; i <= 3; i++)
+        {
+            xA *= i;
+        }
+        var nCrA = nA / (xA * xA);
+        var pA = nCrA * Math.Pow(p, 3.0) * Math.Pow(q, 3.0);
+        // probabilityB = 4 boys / 6 kids -> n = 6; x = 4;
+        var nB = 1;
+        var xB = 1;
+        for (int i = 1; i <= 6; i++)
+        {
+            nB *= i;
+        }
+        for (int i = 1; i <= 4; i++)
+        {
+            xB *= i;
+        }
+        var nCrB = nB / (xB * 2.0);
+        var pB = nCrB * Math.Pow(p, 4.0) * Math.Pow(q, 2.0);
+        // probabilityC = 5 boys / 6 kids -> n = 6; x = 5;
+        var nC = 1;
+        var xC = 1;
+        for (int i = 1; i <= 6; i++)
+        {
+            nC *= i;
+        }
+        for (int i = 1; i <= 5; i++)
+        {
+            xC *= i;
+        }
+        var nCrC = nC / (xC * 1.0);
+        var pC = nCrC * Math.Pow(p, 5.0) * Math.Pow(q, 1.0);
+        // probabilityD = 6 boys / 6 kids -> n = 6; x = 6;
+        var pD = Math.Pow(p, 6.0);
+        Console.WriteLine("{0:0.000}", pA + pB + pC + pD);
+       
+
+    }
+}
