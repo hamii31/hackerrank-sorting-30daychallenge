@@ -1,0 +1,42 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+class Solution
+{
+    static void Main(String[] args)
+    {
+        /* Enter your code here. Read input from STDIN. Print output to STDOUT. Your class should be named Solution */
+        // x1 = 1,2;
+        // x2 = 2,3,4,5,6,7,8,9,10;
+        var n = 10; // a batch of 10 pistons
+        // 12% on average will fail, 88% on average will succeed (88:12)
+        var p = 0.12;
+        var q = 0.88;
+        //P(X=k) = nCk * pk * (1-p)n-k
+        //probabilityA -> 0 failed / 10 total -> n = 10, x = 0
+        //10! / 0! * (10-0)! = 1;
+        var pA = 1 * Math.Pow(p, 0.0) * Math.Pow(q, 10.00);
+        // probabilityB -> 1 failed / total -> n = 10, x = 1
+        var pB = 10 * Math.Pow(p, 1.0) * Math.Pow(q, 9.00);
+        // probabilityC -> 2 failed / total -> n = 10, x = 2
+        var pC = 45 * Math.Pow(p, 2.0) * Math.Pow(q, 8.00);
+        Console.WriteLine("{0:0.000}", pA + pB + pC); // probability of at most 2
+        // probD -> n = 10, x = 3
+        var pD = 120 * Math.Pow(p, 3.0) * Math.Pow(q, 7.0);
+        // probE -> n = 10, x = 4
+        var pE = 210 * Math.Pow(p, 4.0) * Math.Pow(q, 6.0);
+        // probF -> n = 10, x = 5
+        var pF = 252 * Math.Pow(p, 5.0) * Math.Pow(q, 5.0);
+        // probG -> n = 10, x = 6
+        var pG = 210 * Math.Pow(p, 6.0) * Math.Pow(q, 4.0);
+        // probH -> n = 10, x = 7
+        var pH = 120 * Math.Pow(p, 7.0) * Math.Pow(q, 3.0);
+        // probK -> n = 10, x = 8
+        var pK = 45 * Math.Pow(p, 8.0) * Math.Pow(q, 2.0);
+        // probL -> n = 10, x = 9
+        var pL = 10 * Math.Pow(p, 9.0) * Math.Pow(q, 1.0);
+        // probM -> n = 10, x = 10
+        var pM = 1 * Math.Pow(p, 10.0) * Math.Pow(q, 0.0);
+        Console.WriteLine("{0:0.000}", pC + pD + pE + pF + pG + pH + pK + pL + pM);
+    }
+}
