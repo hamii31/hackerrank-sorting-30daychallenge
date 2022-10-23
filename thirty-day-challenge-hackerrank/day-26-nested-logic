@@ -1,0 +1,45 @@
+using System;
+using System.Linq;
+
+class Solution
+{
+    static void Main(String[] args)
+    {
+        /* Enter your code here. Read input from STDIN. Print output to STDOUT. Your class should be named Solution */
+        int[] returndate = Console.ReadLine().Split(" ").Select(int.Parse).ToArray();
+        int day = returndate[0], month = returndate[1], year = returndate[2];
+        int[] dueTo = Console.ReadLine().Split(" ").Select(int.Parse).ToArray();
+        int day1 = dueTo[0], month1 = dueTo[1], year1 = dueTo[2];
+
+        if (year == year1)
+        {
+            if (day <= day1)
+            {
+                if (month <= month1)
+                {
+                    Console.WriteLine(0);
+                }
+                else if (month > month1)
+                {
+                    Console.WriteLine(500 * (month - month1));
+                }
+            }
+            else if (day > day1 && month == month1)
+            {
+                Console.WriteLine(15 * (day - day1));
+            }
+            else if (day > day1 && month > month1)
+            {
+                Console.WriteLine(500 * (month - month1));
+            }
+        }
+        else if (year < year1)
+        {
+            Console.WriteLine(0);
+        }
+        else if (year > year1)
+        {
+            Console.WriteLine(10000);
+        }
+    }
+}
