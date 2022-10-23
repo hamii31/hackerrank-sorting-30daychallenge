@@ -1,0 +1,29 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace conditional_probability
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            var kid1 = new string[] { "b" };
+            var kid2 = new string[] { "b", "g" };
+
+            var total = kid1.Length + kid2.Length; // first possibility is already in fact, one of the kids is a boy,
+                                                   // so we're not looking for that
+            var totalPossibility = 0;
+
+            for (int i = 0; i < kid2.Length; i++)
+            {
+                if (kid2[i] == "b")
+                {
+                    totalPossibility++;
+                }
+            }
+            Console.WriteLine("{0}/{1}", totalPossibility, total);
+           
+        }
+    }
+}
