@@ -1,0 +1,110 @@
+using System;
+
+namespace cargame
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            string input = "";
+            Console.WriteLine("|   '   |");
+            Console.WriteLine("|   '   |");
+            Console.WriteLine("|   '   |");
+            Console.WriteLine("|  [ ]  |");
+            Console.WriteLine("Choose direction: Right or Left");
+            int rip = 0;
+            while (input != "end")
+            {
+                if (rip >= 1)
+                {
+                    break;
+                }
+                input = Console.ReadLine();
+                if (input == "left" || input == "Left")
+                {
+                    Console.WriteLine("|   '   |");
+                    Console.WriteLine("|   '   |");
+                    Console.WriteLine("|   '   |");
+                    Console.WriteLine("|[ ]'   |");
+                    Console.WriteLine("Choose option: Right or Faster");
+                    input = Console.ReadLine();
+                    if (input == "Faster" || input == "faster")
+                    { Console.WriteLine("|   '   |");
+                        Console.WriteLine("|   '   |");
+                        Console.WriteLine("|[ ]'   |");
+                        Console.WriteLine("|   '   |");
+                        Console.WriteLine("WARNING SLOW DOWN! Type in: Slow down");
+                        input = Console.ReadLine();
+                        if (input == "Slow down")
+                        {
+                            Console.WriteLine("|   '   |");
+                            Console.WriteLine("|   '   |");
+                            Console.WriteLine("|   '   |");
+                            Console.WriteLine("|  [ ]  |");
+                            Console.WriteLine("Choose direction: Right or Left");
+                        }
+                        else
+                        {
+                            Console.WriteLine("|  ]'   |");
+                            Console.WriteLine("|[  '   |");
+                            Console.WriteLine("|   '   |");
+                            Console.WriteLine("|   '   |");
+                            Console.WriteLine("YOU CRASHED!");
+                            rip++;
+                            break;
+                        }
+                    }
+                    else if (input == "right" || input == "Right")
+                    {
+                        Console.WriteLine("|   '   |");
+                        Console.WriteLine("|   '   |");
+                        Console.WriteLine("|   '   |");
+                        Console.WriteLine("|   '[ ]|");
+                        Console.WriteLine("Choose option:Left or Right");
+                    }
+
+                }
+                else if (input == "right" || input == "Right")
+                {
+                    Console.WriteLine("|   '   |");
+                    Console.WriteLine("|   '   |");
+                    Console.WriteLine("|   '   |");
+                    Console.WriteLine("|   '[ ]|");
+                    Console.WriteLine("Choose option:Left or Faster");
+                    input = Console.ReadLine();
+                    if (input == "Faster" || input == "faster")
+                    {
+
+                        Console.WriteLine("|   '   |");
+                        Console.WriteLine("|   '   |");
+                        Console.WriteLine("|   '[ ]|");
+                        Console.WriteLine("|   '   |");
+                        Console.WriteLine("WARNING SLOW DOWN! Type in: Slow down");
+                        input = Console.ReadLine();
+                        if (input == "Slow down")
+                        {
+                            Console.WriteLine("|   '   |");
+                            Console.WriteLine("|   '   |");
+                            Console.WriteLine("|   '   |");
+                            Console.WriteLine("|  [ ]  |");
+                            Console.WriteLine("Choose direction: Right or Left");
+                        }
+                        else
+                        {
+                            Console.WriteLine("|   '  ]|");
+                            Console.WriteLine("|   '[  |");
+                            Console.WriteLine("|   '   |");
+                            Console.WriteLine("|   '   |");
+                            Console.WriteLine("YOU CRASHED!");
+                            rip++;
+                            break;
+                        }
+                    }
+                    
+                }
+                
+
+            }
+        }
+    }
+}
