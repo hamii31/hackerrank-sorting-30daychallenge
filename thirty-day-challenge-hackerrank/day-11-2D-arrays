@@ -1,0 +1,53 @@
+using System.CodeDom.Compiler;
+using System.Collections.Generic;
+using System.Collections;
+using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.Serialization;
+using System.Text.RegularExpressions;
+using System.Text;
+using System;
+
+
+
+class Solution
+{
+    public static void Main(string[] args)
+    {
+
+        int[,] matrix = new int[6, 6];
+        for (int r= 0; r < matrix.GetLength(0); r++)
+        {
+            var col = Console.ReadLine().Split().Select(int.Parse).ToArray();
+            for (int c = 0; c < matrix.GetLength(1); c++)
+            {
+                matrix[r, c] = col[c];
+            }
+        }
+        int maxSum = int.MinValue;
+        int rows = 6;
+        int cols = 6;
+        for (int row = 0; row < rows- 2; row++)
+        {
+            for (int col = 0; col < cols - 2; col++)
+            {
+                var hourglassSUm = (matrix[row, col] + matrix[row, col + 1] + matrix[row, col + 2])
+                    + (matrix[row + 1, col + 1])
+                    + (matrix[row + 2, col] + matrix[row + 2, col + 1] + matrix[row + 2, col + 2]);
+
+                if (hourglassSUm > maxSum)
+                {
+                    maxSum = hourglassSUm;
+                }
+               
+            }
+        }
+        Console.WriteLine(maxSum);
+
+
+    }
+}
