@@ -1,0 +1,19 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+class Solution
+{
+    static void Main(String[] args)
+    {
+        /* Enter your code here. Read input from STDIN. Print output to STDOUT. Your class should be named Solution */
+        var L1 = 0.88;
+        var L2 = 1.55;
+        var x = L1 + Math.Pow(L1, 2.0);
+        var y = L2 + Math.Pow(L2, 2.0);
+        var Ca = 160 + 40 * x;
+        var Cb = 128 + 40 * y;
+        Console.WriteLine("{0:0.000}", Ca);
+        Console.WriteLine("{0:0.000}", Cb);
+
+    }
+}
