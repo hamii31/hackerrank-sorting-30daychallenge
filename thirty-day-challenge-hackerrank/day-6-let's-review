@@ -1,0 +1,21 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+
+class Solution
+{
+    static void Main(String[] args)
+    {
+        /* Enter your code here. Read input from STDIN. Print output to STDOUT. Your class should be named Solution */
+        int T = int.Parse(Console.ReadLine());
+        for (int i = 0; i < T; i++)
+        {
+            string input = Console.ReadLine();
+            string evenResult = string.Concat(input.Where((c, i) => i % 2 == 0));
+            string oddResult = string.Concat(input.Where((c, i) => i % 2 == 1));
+
+            Console.WriteLine(evenResult + " " + oddResult);
+        }       
+    }
+}
