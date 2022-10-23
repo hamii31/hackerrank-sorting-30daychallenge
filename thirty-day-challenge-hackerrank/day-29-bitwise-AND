@@ -1,0 +1,25 @@
+using System;
+
+class Solution
+{
+    static void Main(String[] args)
+    {
+        int input = Convert.ToInt32(Console.ReadLine());
+
+        for (int i = 0; i < input; i++)
+        {
+            string[] values = Console.ReadLine().Split(' ');
+            int n = Convert.ToInt32(values[0]);
+            int k = Convert.ToInt32(values[1]);
+
+            if (((k - 1) | k) > n && k % 2 == 0)
+            {
+                Console.WriteLine(k - 2);
+            }
+            else
+            {
+                Console.WriteLine(k - 1);
+            }
+        }
+    }
+}
