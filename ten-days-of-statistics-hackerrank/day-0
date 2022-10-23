@@ -1,0 +1,57 @@
+using System.CodeDom.Compiler;
+using System.Collections.Generic;
+using System.Collections;
+using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.Serialization;
+using System.Text.RegularExpressions;
+using System.Text;
+using System;
+
+class Result
+{
+
+    /*
+     * Complete the 'weightedMean' function below.
+     *
+     * The function accepts following parameters:
+     *  1. INTEGER_ARRAY X
+     *  2. INTEGER_ARRAY W
+     */
+
+    public static void weightedMean(int[] X, int[] W)
+    {
+
+        var sum1 = 0.0;
+        for (int i = 0; i < X.Length; i++)
+        {
+            sum1 += X[i] * W[0 + i];
+        }
+        var sum2 = 0.0;
+        foreach (var item in W)
+        {
+            sum2 += item;
+        }
+        Console.WriteLine("{0:0.0}", sum1/sum2);
+
+    }
+
+}
+
+class Solution
+{
+    public static void Main(string[] args)
+    {
+        int n = Convert.ToInt32(Console.ReadLine().Trim());
+        var X = new int[n];
+        var W = new int[n];
+        X = Console.ReadLine().Split(' ').Select(int.Parse).ToArray();
+        W = Console.ReadLine().Split(' ').Select(int.Parse).ToArray();
+
+        Result.weightedMean(X, W);
+    }
+}
