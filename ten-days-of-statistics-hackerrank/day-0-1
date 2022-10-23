@@ -1,0 +1,47 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+
+class Solution
+{
+    static void Main(String[] args)
+    {
+        /* Enter your code here. Read input from STDIN. Print output to STDOUT. Your class should be named Solution */
+        int n = int.Parse(Console.ReadLine());
+        double[] array = Console.ReadLine().Split(" ").Select(double.Parse).ToArray();
+        //mean
+        double sum = 0.0;
+        foreach (var item in array)
+        {
+            sum += item;
+        }
+        Console.WriteLine("{0:0.0}", sum / n);
+        //median
+        sum = 0;
+        Array.Sort(array);
+        int skip = (array.Length / 2) - 1;
+        var middle = array.Skip(skip).Take(2).ToArray();
+        foreach (var item in middle)
+        {
+            sum += item;
+        }
+        Console.WriteLine(sum / 2);
+        //mode
+        Dictionary<double, int> count = new Dictionary<double, int>();
+        foreach (var item in array)
+        {
+            if (count.ContainsKey(item))
+            {
+                count[item] += 1;
+            }
+            else
+            {
+                count[item] = 1;
+            }
+        }
+        int highestCount = count.Max(item => item.Value);
+        Console.WriteLine(count.Where(p => p.Value == highestCount).OrderBy(p => p.Key).Select(p => p.Key).First());
+
+    }
+}
