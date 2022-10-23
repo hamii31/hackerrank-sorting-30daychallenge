@@ -1,0 +1,31 @@
+using System;
+using System.Collections.Generic;
+
+class Solution
+{
+    static void Main(String[] args)
+    {
+        /* Enter your code here. Read input from STDIN. Print output to STDOUT. Your class should be named Solution */
+        int n = int.Parse(Console.ReadLine());
+        IDictionary<string, int> namePhones = new Dictionary<string, int>();
+        for (int i = 0; i < n; i++)
+        {
+            string input = Console.ReadLine();
+            int number = Convert.ToInt32(input.Substring(input.IndexOf(" ")));
+            string name = input.Substring(0, input.IndexOf(" "));
+            namePhones.Add(name, number);
+        }
+        for(int r = 0; r < n; r++)
+        {
+            string input = Console.ReadLine();
+            if (namePhones.ContainsKey(input))
+            {
+                Console.WriteLine($"{input}={namePhones[input]}");
+            }
+            else
+            {
+                Console.WriteLine("Not found");
+            }
+        }
+    }
+}
