@@ -1,0 +1,23 @@
+using System;
+
+namespace CLT2
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            var total = 250.0;
+            var mean = 2.4;
+            var stDev = 2.0;
+            var n = 100;
+
+            var nMean = n * 2.4;
+            var nstDev = 2.0 * Math.Pow(n, 0.5);
+
+            var prob = (250 - nMean) / (nstDev * Math.Sqrt(2.0));
+
+            Console.WriteLine("{0:0.0000}", 0.5 * (1 + prob) + 0.0147 /* erf value */);
+
+        }
+    }
+}
