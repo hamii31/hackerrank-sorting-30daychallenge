@@ -1,0 +1,18 @@
+using System;
+
+namespace geometricDistribution
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            //P(X = x) = (1-p)^x-1*p
+            var p = 0.33;
+            var q = 0.67;
+            var x = 5;
+            //P(X = 5) = (1-0.33)^5-1*0.33
+            var P = Math.Pow(q, 4.0) * 0.33;
+            Console.WriteLine("{0:0.000}", P);
+        }
+    }
+}
