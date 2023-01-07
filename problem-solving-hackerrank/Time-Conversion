@@ -1,0 +1,100 @@
+using System.CodeDom.Compiler;
+using System.Collections.Generic;
+using System.Collections;
+using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.Serialization;
+using System.Text.RegularExpressions;
+using System.Text;
+using System;
+
+class Result
+{
+
+    /*
+     * Complete the 'timeConversion' function below.
+     *
+     * The function is expected to return a STRING.
+     * The function accepts STRING s as parameter.
+     */
+
+    public static string timeConversion(string s)
+    {
+         var splitted = s.Split(":");
+        var hours = splitted[0];
+        if (s.EndsWith("PM"))
+        {
+            switch (hours)
+            {
+                case "01":
+                    s = s.Replace(hours, "13");
+                    break;
+                case "02":
+                    s = s.Replace(hours, "14");
+                    break;
+                case "03":
+                    s = s.Replace(hours, "15");
+                    break;
+                case "04":
+                    s = s.Replace(hours, "16");
+                    break;
+                case "05":
+                    s = s.Replace(hours, "17");
+                    break;
+                case "06":
+                    s = s.Replace(hours, "18");
+                    break;
+                case "07":
+                    s = s.Replace(hours, "19");
+                    break;
+                case "08":
+                    s = s.Replace(hours, "20");
+                    break;
+                case "09":
+                    s = s.Replace(hours, "21");
+                    break;
+                case "10":
+                    s = s.Replace(hours, "22");
+                    break;
+                case "11":
+                    s = s.Replace(hours, "23");
+                    break;
+                default:
+                    break;
+            }
+            s = s.Remove(s.Length - 2, 2);
+            return s;
+        }
+        else
+        {
+            if (hours == "12")
+            {
+                s = s.Replace(hours, "00");
+            }
+            s = s.Remove(s.Length - 2, 2);
+            return s;
+        }
+    }
+
+}
+
+class Solution
+{
+    public static void Main(string[] args)
+    {
+        TextWriter textWriter = new StreamWriter(@System.Environment.GetEnvironmentVariable("OUTPUT_PATH"), true);
+
+        string s = Console.ReadLine();
+
+        string result = Result.timeConversion(s);
+
+        textWriter.WriteLine(result);
+
+        textWriter.Flush();
+        textWriter.Close();
+    }
+}
