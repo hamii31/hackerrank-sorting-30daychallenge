@@ -1,0 +1,63 @@
+using System.Collections.Generic;
+using System.Linq;
+using System;
+
+class Result
+{
+
+    /*
+     * Complete the 'miniMaxSum' function below.
+     *
+     * The function accepts INTEGER_ARRAY arr as parameter.
+     */
+
+    public static void miniMaxSum(List<int> arr)
+    {
+        var index = 0;
+        long min = long.MaxValue;
+        long max = long.MinValue;
+        while (true)
+        {
+            long sum = 0;
+            if (index == 5)
+            {
+                break;
+            }
+            for (int i = 0; i < arr.Count; i++)
+            {
+                if (index == i)
+                {
+                    continue;
+                }
+                else
+                {
+                    sum += Convert.ToInt64(arr[i]);
+                }
+                
+            }
+            index++;
+            if (sum > max)
+            {
+                max = sum;
+            }
+            if(sum < min)
+            {
+                min = sum;
+            }
+        }
+        Console.Write(min + " ");
+        Console.Write(max);
+    }
+
+}
+
+class Solution
+{
+    public static void Main(string[] args)
+    {
+
+        List<int> arr = Console.ReadLine().TrimEnd().Split(' ').ToList().Select(arrTemp => Convert.ToInt32(arrTemp)).ToList();
+
+        Result.miniMaxSum(arr);
+    }
+}
