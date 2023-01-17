@@ -4,15 +4,27 @@ namespace ViralDNAOverwriting
 {
     internal class Program
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
             
             Organism human = new Organism();
             Virus virus = new Virus();
-            //Virus virus2 = new Virus();
             long totalVirusCells = virus.Count;
+            long holder = 0;
+
+            totalVirusCells = ViralReplication(totalVirusCells, virus, holder);
+            Console.WriteLine(totalVirusCells);
+            Console.WriteLine($"{virus.VirusName} has been detected by the body's immune system!");
+            Console.WriteLine($"A total of {human.WhiteCell} have been dispatched to deal with {virus.VirusName}");
+
             while (true)
             {
+                if (human.TotalOrganFailure == true)
+                {
+                    Console.WriteLine("The human is dead!");
+                    Console.WriteLine($"Total virus cells left: {virus.Count}");
+                    break;
+                }
                 if (human.IsAlive == false)
                 {
                     Console.WriteLine("The human is dead!");
@@ -21,29 +33,45 @@ namespace ViralDNAOverwriting
                 }
                 else if (virus.IsAlive == false)
                 {
-                    Console.WriteLine("The virus has been wiped out!");
-                    Console.WriteLine($"Total healthy human cells left: {human.CellCount}");
+                    Console.WriteLine($"{virus.VirusName} has been wiped out!");
+                    Console.WriteLine($"Total healthy human cells left: {human.WhiteCell}");
                     break;
                 }
-                else if (virus.Count < 0 /*&& virus2.Count < 0*/)
+                else if (virus.Count < 0)
                 {
-                    Console.WriteLine("The virus has been wiped out!");
-                    Console.WriteLine($"Total healthy human cells left: {human.CellCount}");
+                    Console.WriteLine($"{virus.VirusName} has been wiped out!");
+                    Console.WriteLine($"Total healthy human cells left: {human.WhiteCell}");
                     break;
+                }
+                if (human.Combat(totalVirusCells))
+                {
+                    long dead = human.WhiteCell - totalVirusCells;
+                    Random rnd = new Random();
+                    totalVirusCells = rnd.Next(0, 2);
+                    virus.KillCells(dead);
+                    totalVirusCells = ViralReplication(totalVirusCells, virus, holder);
                 }
                 else
-                { 
-                    virus = new Virus();
-                    //virus2 = new Virus();
-                    totalVirusCells += virus.Count; /*+ virus2.Count;*/
-                    if (human.Combat(totalVirusCells))
-                    {
-                        long dead = totalVirusCells / 2;
-                        totalVirusCells -= dead;
-                        virus.KillCells(dead);
-                    }
+                {
+                    Console.WriteLine("The human is dead!");
+                    Console.WriteLine($"Total virus cells left: {virus.Count}");
+                    break;
                 }
+               
             }
+           
+        }
+        public static long ViralReplication(long totalVirusCells, Virus virus, long holder)
+        {
+            for (int i = 0; i < totalVirusCells; i++) // each virus now starts multiplicating;
+            {
+                virus = new Virus();
+                holder += virus.Count;
+            };
+
+            totalVirusCells = holder;
+
+            return totalVirusCells;
         }
     }
 }
