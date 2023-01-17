@@ -1,0 +1,44 @@
+
+
+namespace ViralDNAOverwriting
+{
+    public class Organism
+    { 
+        public bool IsAlive = true;
+        public long CellCount = 300000000000;
+
+        public bool Combat(long virusCells)
+        {
+            if (virusCells > CellCount)
+            {
+                IsAlive = false;
+                return false;
+            }
+            else
+            {
+                Random rnd = new Random();
+                long percentage = rnd.Next(4, 10);
+                long whiteCells = CellCount / percentage;
+                CellCount -= whiteCells;
+                if (virusCells > whiteCells)
+                {
+                    KillCells(whiteCells);
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
+            }
+        }
+        
+        public void KillCells(long dead)
+        {
+            CellCount -= dead;
+            if (CellCount <= 10000)
+            {
+                IsAlive = false;
+            }
+        }
+    }
+}
