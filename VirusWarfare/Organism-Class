@@ -5,39 +5,71 @@ namespace ViralDNAOverwriting
     public class Organism
     { 
         public bool IsAlive = true;
-        public long CellCount = 300000000000;
+        public long WhiteCell { get; set; }
 
+        public bool TotalOrganFailure = false;
+        public Organism()
+        {
+            TotalWhiteCells();
+        }
+        public void TotalWhiteCells()
+        {
+            Random rnd = new Random();
+            int lowEnd = 25000000;
+            int highEnd = 500000000;
+            long whiteCells = rnd.Next(lowEnd, highEnd);
+            WhiteCell = whiteCells;
+        }
         public bool Combat(long virusCells)
         {
-            if (virusCells > CellCount)
+
+            if (virusCells > WhiteCell)
             {
                 IsAlive = false;
                 return false;
             }
             else
             {
-                Random rnd = new Random();
-                long percentage = rnd.Next(4, 10);
-                long whiteCells = CellCount / percentage;
-                CellCount -= whiteCells;
-                if (virusCells > whiteCells)
+                if (virusCells > WhiteCell)
                 {
-                    KillCells(whiteCells);
+                    KillCells(virusCells - WhiteCell);
                     return false;
                 }
                 else
                 {
+                    KillCells(WhiteCell - virusCells * 2);
                     return true;
                 }
             }
         }
-        
+        public void GetReinforcements()
+        {
+
+        }
         public void KillCells(long dead)
         {
-            CellCount -= dead;
-            if (CellCount <= 10000)
+            bool brainDead = false;
+            bool heartFailure = false;
+            WhiteCell -= dead;
+            
+            if (TotalOrganFailure == true)
             {
                 IsAlive = false;
+            }
+            if (WhiteCell <= 5000000)
+            {
+                Console.WriteLine("Brain is shutting down!");
+                brainDead = true; 
+            }
+            if (brainDead && WhiteCell <= 1000000)
+            {
+                Console.WriteLine("Heart stopped beating!");
+                heartFailure = true;
+            }
+            if (heartFailure && WhiteCell <= 500000)
+            {
+                Console.WriteLine("Total organ failure ensued!");
+                TotalOrganFailure = true;
             }
         }
     }
