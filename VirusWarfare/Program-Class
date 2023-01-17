@@ -1,0 +1,49 @@
+
+
+namespace ViralDNAOverwriting
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            
+            Organism human = new Organism();
+            Virus virus = new Virus();
+            //Virus virus2 = new Virus();
+            long totalVirusCells = virus.Count;
+            while (true)
+            {
+                if (human.IsAlive == false)
+                {
+                    Console.WriteLine("The human is dead!");
+                    Console.WriteLine($"Total virus cells left: {virus.Count}");
+                    break;
+                }
+                else if (virus.IsAlive == false)
+                {
+                    Console.WriteLine("The virus has been wiped out!");
+                    Console.WriteLine($"Total healthy human cells left: {human.CellCount}");
+                    break;
+                }
+                else if (virus.Count < 0 /*&& virus2.Count < 0*/)
+                {
+                    Console.WriteLine("The virus has been wiped out!");
+                    Console.WriteLine($"Total healthy human cells left: {human.CellCount}");
+                    break;
+                }
+                else
+                { 
+                    virus = new Virus();
+                    //virus2 = new Virus();
+                    totalVirusCells += virus.Count; /*+ virus2.Count;*/
+                    if (human.Combat(totalVirusCells))
+                    {
+                        long dead = totalVirusCells / 2;
+                        totalVirusCells -= dead;
+                        virus.KillCells(dead);
+                    }
+                }
+            }
+        }
+    }
+}
