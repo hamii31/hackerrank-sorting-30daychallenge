@@ -1,0 +1,105 @@
+
+
+namespace ViralDNAOverwriting
+{
+    public class Virus
+    {
+        private string DNA = "INFECT/HIDE/HIJACKCELL/OVERWRITEDNA/MULTIPLY/REPEATFROMSTEP2";
+        private bool DefensiveMembrane = true;
+        private bool CellInvasiveParameters = false;
+        private bool HasEnteredAnOrganism = false;
+
+        private string VirusName = "THEABSOLUTEKILLER";
+        private string CellDNA { get; set; }
+
+        public long Count = 0;
+
+        private int CellResources = 100;
+
+        public bool IsAlive = true;
+        private void Infect()
+        {
+            if (HasEnteredAnOrganism == true)
+            {
+                DefensiveMembrane = false;
+                Hide();
+            }
+        }
+
+        
+        public Virus()
+        {
+            CellDNA = "OBEYTOTHEBODY/CONSUME/GIVEPRODUCEBACK/BEUSEFULTOTHEBODY/REPORTSUSPICIOUSBEHAVIOUR";
+            HasEnteredAnOrganism = true;
+            Infect();
+            CheckIfDead(Count);
+        }
+        private void Hide()
+        {
+            CellInvasiveParameters = true;
+            Camouflage();
+            EnterCell();
+        }
+        private void EnterCell()
+        {
+            var overwrittenDNA = OverwriteCellDNA(CellDNA);
+            Console.WriteLine(overwrittenDNA);
+            BeginMultiplying();
+        }
+        private void Camouflage()
+        {
+            string FakeDNAProjection = "HOST-RNA-MESSENGER-WITH-URGENT-MESSAGE-FOR-A-CELL";
+            VirusName = "Normal RNA messenger";
+            Console.WriteLine(FakeDNAProjection);
+            
+        }
+        private string OverwriteCellDNA(string DNA)
+        {
+            if (DNA.Contains("OBEYTOTHEBODY"))
+            {
+                DNA = DNA.Replace("OBEYTOTHEBODY", "OBEYTOTHEVIRUS");
+            }
+            if (DNA.Contains("GIVEPRODUCEBACK"))
+            {
+                DNA = DNA.Replace("GIVEPRODUCEBACK", "GIVEPRODUCETOVIRUS");
+            }
+            if (DNA.Contains("BEUSEFULTOTHEBODY"))
+            {
+                DNA = DNA.Replace("BEUSEFULTOTHEBODY", "BEUSEFULTOTHEVIRUS");
+            }
+            if (DNA.Contains("REPORTSUSPICIOUSBEHAVIOUR"))
+            {
+                DNA = DNA.Replace("REPORTSUSPICIOUSBEHAVIOUR", "IFCHECKEDFORSUSPICIOUSBEHAVIOURGIVEALLCLEARBACK");
+            }
+            return DNA;
+        }
+        private void BeginMultiplying()
+        {
+            while (CellResources > 0)
+            {
+                CellResources -= 1;
+                Count += 1000;
+            }
+            Random mutations = new Random();
+            int lethalMutations = mutations.Next(100);
+            int helpfulMutations = mutations.Next(100);
+            Count = (Count - lethalMutations) + helpfulMutations;
+            Console.WriteLine($"Total Viral Cells Accumulated: {Count}");
+        }
+        public void KillCells(long dead)
+        {
+            Count -= dead;
+        }
+        private void CheckIfDead(long count)
+        {
+            if (count <= 0)
+            {
+                IsAlive = false;
+            }
+            else
+            {
+                IsAlive = true;
+            }
+        }
+    }
+}
