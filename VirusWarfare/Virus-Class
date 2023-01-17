@@ -8,8 +8,6 @@ namespace ViralDNAOverwriting
         private bool DefensiveMembrane = true;
         private bool CellInvasiveParameters = false;
         private bool HasEnteredAnOrganism = false;
-
-        private string VirusName = "THEABSOLUTEKILLER";
         private string CellDNA { get; set; }
 
         public long Count = 0;
@@ -17,6 +15,8 @@ namespace ViralDNAOverwriting
         private int CellResources = 100;
 
         public bool IsAlive = true;
+
+        public string VirusName = "THEABSOLUTEKILLER";
         private void Infect()
         {
             if (HasEnteredAnOrganism == true)
@@ -34,6 +34,8 @@ namespace ViralDNAOverwriting
             Infect();
             CheckIfDead(Count);
         }
+
+        
         private void Hide()
         {
             CellInvasiveParameters = true;
@@ -49,7 +51,6 @@ namespace ViralDNAOverwriting
         private void Camouflage()
         {
             string FakeDNAProjection = "HOST-RNA-MESSENGER-WITH-URGENT-MESSAGE-FOR-A-CELL";
-            VirusName = "Normal RNA messenger";
             Console.WriteLine(FakeDNAProjection);
             
         }
@@ -78,7 +79,7 @@ namespace ViralDNAOverwriting
             while (CellResources > 0)
             {
                 CellResources -= 1;
-                Count += 1000;
+                Count += 100; // for realistic multiplication make it 1000 per click instead of 10!
             }
             Random mutations = new Random();
             int lethalMutations = mutations.Next(100);
