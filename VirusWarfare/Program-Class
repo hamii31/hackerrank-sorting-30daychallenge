@@ -8,7 +8,7 @@ namespace ViralDNAOverwriting
         {
             
             Organism human = new Organism();
-            Virus virus = new Virus();
+            Virus virus = new Virus(); // a real scenario would call for more than a single viral cell
             long totalVirusCells = virus.Count;
             long holder = 0;
 
