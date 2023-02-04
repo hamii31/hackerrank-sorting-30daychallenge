@@ -1,0 +1,417 @@
+
+using System.Text;
+
+namespace DNACleanser
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            string inputFilePath = @"..\..\..\Files\input.txt"; // input flawed DNA 
+            string outputFilePath = @"..\..\..\Files\output.txt"; // output fixed DNA
+
+            DNACLeaning(inputFilePath, outputFilePath);
+        }
+
+        private static void DNACLeaning(string inputFilePath, string outputFilePath)
+        {
+            using (StreamReader reader = new StreamReader(inputFilePath))
+            {
+                using (StreamWriter writer = new StreamWriter(outputFilePath))
+                {
+                    bool hasstarted = false;
+                    bool hasstopped = false;
+
+                    char[] CRLF = new char[2] { '\n', '\r' };
+                    TextReader tr = File.OpenText(inputFilePath);
+                    char[] placeholder1 = new char[] {};
+                    List<char> placeholder2 = new List<char>();
+
+                    List<string> DNA = new List<string>();
+                    var count = 0;
+                    foreach (var item in tr.ReadToEnd())
+                    {
+                        placeholder2.Add(item);
+                        placeholder1 = placeholder2.ToArray();
+                        count++;
+                        if (count == 3)
+                        {
+                            count = 0;
+                            string s = new string(placeholder1);
+                            DNA.Add(s);
+                            placeholder2.Clear();
+                            placeholder1 = Array.Empty<char>();
+                        }              
+                    }
+                    Console.WriteLine(string.Join("", DNA));
+
+                    int ATGPos = DNA.FindIndex(s => s.Equals("ATG"));
+                    int StopPos = DNA.FindIndex(s => s.Equals("TAA") || s.Equals("TAG") || s.Equals("TGA"));
+
+                    StringBuilder sb = new StringBuilder();
+
+                    bool editedDNA = false;
+                    List<string> ToRemove = new List<string>();
+
+                    foreach (var item in DNA)
+                    {
+                        var line = item;
+                        if (line.Contains("ATG"))
+                        {
+                            hasstarted = true;
+                            hasstopped = false;
+                            sb.AppendLine("Synthesizing started!");
+                            continue;
+                        }
+                        if (line.Contains("TAA")
+                           || line.Contains("TAG") || line.Contains("TGA"))
+                        {
+
+                            if (ATGPos < StopPos)
+                            {
+                                hasstopped = true;
+                                hasstarted = false;
+                                sb.AppendLine("Synthesizing stopped!");
+                                continue;
+                            }
+                        }
+                        if (hasstarted)
+                        {
+                            if (line.Contains("TTT")
+                           || line.Contains("TTC"))
+                            {
+                                int positionA = DNA.FindIndex(s => s.Equals("TTT"));
+                                int positionB = DNA.FindIndex(s => s.Equals("TTC"));
+                                if (ATGPos < positionA || ATGPos < positionB)
+                                {
+                                    sb.AppendLine("Phenylalanine synthesized!");
+                                    continue;
+                                }
+                            }
+                            if (line.Contains("TTA")
+                                || line.Contains("TTG") || line.Contains("CTT")
+                                || line.Contains("CTC") || line.Contains("CTA")
+                                || line.Contains("CTG"))
+                            {
+                                int positionA = DNA.FindIndex(s => s.Equals("TTA"));
+                                int positionB = DNA.FindIndex(s => s.Equals("TTG"));
+                                int positionC = DNA.FindIndex(s => s.Equals("CTT"));
+                                int positionD = DNA.FindIndex(s => s.Equals("CTC"));
+                                int positionE = DNA.FindIndex(s => s.Equals("CTA"));
+                                int positionF = DNA.FindIndex(s => s.Equals("CTG"));
+                         
+                                if (ATGPos < positionA || ATGPos < positionB || ATGPos < positionC || ATGPos < positionD
+                                    || ATGPos < positionE || ATGPos < positionF)
+                                {
+                                    sb.AppendLine("Leucine synthesized!");
+                                    continue;
+                                }
+                            }
+                            if (line.Contains("ATT")
+                                || line.Contains("ATA") || line.Contains("ATC"))
+                            {
+                                int positionA = DNA.FindIndex(s => s.Equals("ATT"));
+                                int positionB = DNA.FindIndex(s => s.Equals("ATA"));
+                                int positionC = DNA.FindIndex(s => s.Equals("ATC"));
+                                if (ATGPos < positionA || ATGPos < positionB || ATGPos < positionC)
+                                {
+                                    sb.AppendLine("Isoleucine synthesized!");
+                                    continue;
+                                }
+                            }
+                            if (line.Contains("GTT")
+                                || line.Contains("GTC") || line.Contains("GTA")
+                                || line.Contains("GTG"))
+                            {
+                                int positionA = DNA.FindIndex(s => s.Equals("GTT"));
+                                int positionB = DNA.FindIndex(s => s.Equals("GTC"));
+                                int positionC = DNA.FindIndex(s => s.Equals("GTA"));
+                                int positionD = DNA.FindIndex(s => s.Equals("GTG"));
+                                if (ATGPos < positionA || ATGPos < positionB || ATGPos < positionC || ATGPos < positionD)
+                                {
+                                    sb.AppendLine("Valine synthesized!");
+                                    continue;
+                                }
+                            }
+                            if (line.Contains("TCT")
+                                || line.Contains("TCC") || line.Contains("TCA")
+                                || line.Contains("TCG") || line.Contains("AGT")
+                                || line.Contains("AGC"))
+                            {
+                                int positionA = DNA.FindIndex(s => s.Equals("TCT"));
+                                int positionB = DNA.FindIndex(s => s.Equals("TCC"));
+                                int positionC = DNA.FindIndex(s => s.Equals("TCA"));
+                                int positionD = DNA.FindIndex(s => s.Equals("TCG"));
+                                int positionE = DNA.FindIndex(s => s.Equals("AGT"));
+                                int positionF = DNA.FindIndex(s => s.Equals("AGC"));
+                                
+                                if (ATGPos < positionA || ATGPos < positionB || ATGPos < positionC || ATGPos < positionD
+                                   || ATGPos < positionE || ATGPos < positionF)
+                                {
+                                    sb.AppendLine("Serine synthesized!");
+                                    continue;
+                                }
+                            }
+                            if (line.Contains("CCT")
+                                || line.Contains("CCC") || line.Contains("CCA")
+                                || line.Contains("CCG"))
+                            {
+                                int positionA = DNA.FindIndex(s => s.Equals("CCT"));
+                                int positionB = DNA.FindIndex(s => s.Equals("CCC"));
+                                int positionC = DNA.FindIndex(s => s.Equals("CCA"));
+                                int positionD = DNA.FindIndex(s => s.Equals("CCG"));
+                                if (ATGPos < positionA || ATGPos < positionB || ATGPos < positionC || ATGPos < positionD)
+                                {
+                                    sb.AppendLine("Proline synthesized!");
+                                    continue;
+                                }
+                            }
+                            if (line.Contains("ACT")
+                                || line.Contains("ACC") || line.Contains("ACA")
+                                || line.Contains("ACG"))
+                            {
+                                int positionA = DNA.FindIndex(s => s.Equals("ACT"));
+                                int positionB = DNA.FindIndex(s => s.Equals("ACC"));
+                                int positionC = DNA.FindIndex(s => s.Equals("ACA"));
+                                int positionD = DNA.FindIndex(s => s.Equals("ACG"));
+                                if (ATGPos < positionA || ATGPos < positionB || ATGPos < positionC || ATGPos < positionD)
+                                {
+                                    sb.AppendLine("Threonine synthesized!");
+                                    continue;
+                                }
+                            }
+                            if (line.Contains("GCT")
+                                || line.Contains("GCC") || line.Contains("GCA")
+                                || line.Contains("GCG"))
+                            {
+                                int positionA = DNA.FindIndex(s => s.Equals("GCT"));
+                                int positionB = DNA.FindIndex(s => s.Equals("GCC"));
+                                int positionC = DNA.FindIndex(s => s.Equals("GCA"));
+                                int positionD = DNA.FindIndex(s => s.Equals("GCG"));
+                                if (ATGPos < positionA || ATGPos < positionB || ATGPos < positionC || ATGPos < positionD)
+                                {
+                                    sb.AppendLine("Alanine synthesized!");
+                                    continue;
+                                }
+                            }
+                            if (line.Contains("TAT") || line.Contains("TAC"))
+                            {
+                                int positionA = DNA.FindIndex(s => s.Equals("TAT"));
+                                int positionB = DNA.FindIndex(s => s.Equals("TAC"));
+                                if (ATGPos < positionA || ATGPos < positionB)
+                                {
+                                    sb.AppendLine("Tyrosine synthesized!");
+                                    continue;
+                                }
+                            }
+                            if (line.Contains("CAT") || line.Contains("CAC"))
+                            {
+                                int positionA = DNA.FindIndex(s => s.Equals("CAT"));
+                                int positionB = DNA.FindIndex(s => s.Equals("CAC"));
+                                if (ATGPos < positionA || ATGPos < positionB)
+                                {
+                                    sb.AppendLine("Histidine synthesized!");
+                                    continue;
+                                }
+                            }
+                            if (line.Contains("CAA") || line.Contains("CAG"))
+                            {
+                                int positionA = DNA.FindIndex(s => s.Equals("CAA"));
+                                int positionB = DNA.FindIndex(s => s.Equals("CAG"));
+                                if (ATGPos < positionA || ATGPos < positionB)
+                                {
+                                    sb.AppendLine("Glutamine synthesized!");
+                                    continue;
+                                }
+                            }
+                            if (line.Contains("AAT") || line.Contains("AAC"))
+                            {
+                                int positionA = DNA.FindIndex(s => s.Equals("AAT"));
+                                int positionB = DNA.FindIndex(s => s.Equals("AAC"));
+                                if (ATGPos < positionA || ATGPos < positionB)
+                                {
+                                    sb.AppendLine("Asparagine synthesized!");
+                                    continue;
+                                }
+                            }
+                            if (line.Contains("AAA") || line.Contains("AAG"))
+                            {
+                                int positionA = DNA.FindIndex(s => s.Equals("AAA"));
+                                int positionB = DNA.FindIndex(s => s.Equals("AAG"));
+                                if (ATGPos < positionA || ATGPos < positionB)
+                                {
+                                    sb.AppendLine("Lysine synthesized!");
+                                    continue;
+                                }
+                            }
+                            if (line.Contains("GAT") || line.Contains("GAC"))
+                            {
+                                int positionA = DNA.FindIndex(s => s.Equals("GAT"));
+                                int positionB = DNA.FindIndex(s => s.Equals("GAC"));
+                                if (ATGPos < positionA || ATGPos < positionB)
+                                {
+                                    sb.AppendLine("Aspartic Acid synthesized!");
+                                    continue;
+                                }
+                            }
+                            if (line.Contains("GAA") || line.Contains("GAG"))
+                            {
+                                int positionA = DNA.FindIndex(s => s.Equals("GAA"));
+                                int positionB = DNA.FindIndex(s => s.Equals("GAG"));
+                                if (ATGPos < positionA || ATGPos < positionB)
+                                {
+                                    sb.AppendLine("Glutamic Acid synthesized!");
+                                    continue;
+                                }
+                            }
+                            if (line.Contains("TGT") || line.Contains("TGC"))
+                            {
+                                int positionA = DNA.FindIndex(s => s.Equals("TGT"));
+                                int positionB = DNA.FindIndex(s => s.Equals("TGC"));
+                                if (ATGPos < positionA || ATGPos < positionB)
+                                {
+                                    sb.AppendLine("Cysteine synthesized!");
+                                    continue;
+                                }
+                            }
+                            if (line.Contains("TGG"))
+                            {
+                                int position = DNA.FindIndex(s => s.Equals("TTG"));
+                                if (ATGPos < position)
+                                {
+                                    sb.AppendLine("Tryptophan synthesized!");
+                                    continue;
+                                }
+                            }
+                            if (line.Contains("CGT")
+                               || line.Contains("CGC") || line.Contains("CGA")
+                               || line.Contains("CGG") || line.Contains("AGA")
+                               || line.Contains("AGG"))
+                            {
+                                int positionA = DNA.FindIndex(s => s.Equals("CGT"));
+                                int positionB = DNA.FindIndex(s => s.Equals("CGC"));
+                                int positionC = DNA.FindIndex(s => s.Equals("CGA"));
+                                int positionD = DNA.FindIndex(s => s.Equals("CGG"));
+                                int positionE = DNA.FindIndex(s => s.Equals("AGA"));
+                                int positionF = DNA.FindIndex(s => s.Equals("AGG"));
+                                if (ATGPos < positionA || ATGPos < positionB || ATGPos < positionC || ATGPos < positionD
+                                    || ATGPos < positionE || ATGPos < positionF)
+                                {
+                                    sb.AppendLine("Arginine synthesized!");
+                                    continue;
+                                }
+                            }
+                            if (line.Contains("GGT")
+                               || line.Contains("GGC") || line.Contains("GGA")
+                               || line.Contains("GGG"))
+                            {
+                                int positionA = DNA.FindIndex(s => s.Equals("GGT"));
+                                int positionB = DNA.FindIndex(s => s.Equals("GGC"));
+                                int positionC = DNA.FindIndex(s => s.Equals("GGA"));
+                                int positionD = DNA.FindIndex(s => s.Equals("GGG"));
+                                if (ATGPos < positionA || ATGPos < positionB || ATGPos < positionC || ATGPos < positionD)
+                                {
+                                    sb.AppendLine("Glycine synthesized!");
+                                    continue;
+                                }
+                            }
+                            else
+                            {
+                                sb.AppendLine($"Amino acid - {line} is not recognized! Removing!");
+                                ToRemove.Add(line);
+                                editedDNA = true;
+                                continue;
+                            }
+                        }
+                        else
+                        {
+                            if (line.Contains("CGT")
+                               || line.Contains("CGC") || line.Contains("CGA")
+                               || line.Contains("CGG") || line.Contains("AGA")
+                               || line.Contains("AGG") || line.Contains("GGT")
+                               || line.Contains("GGC") || line.Contains("GGA")
+                               || line.Contains("GGG") || line.Contains("TGG")
+                               || line.Contains("TGT") || line.Contains("TGC")
+                               || line.Contains("GAA") || line.Contains("GAG")
+                               || line.Contains("GAT") || line.Contains("GAC")
+                               || line.Contains("AAA") || line.Contains("AAG")
+                               || line.Contains("AAT") || line.Contains("AAC")
+                               || line.Contains("CAA") || line.Contains("CAG")
+                               || line.Contains("CAT") || line.Contains("CAC")
+                               || line.Contains("TAT") || line.Contains("TAC")
+                               || line.Contains("GCT") || line.Contains("GCC")
+                               || line.Contains("GCA") || line.Contains("GCG")
+                               || line.Contains("ACT") || line.Contains("ACC")
+                               || line.Contains("ACA") || line.Contains("ACG")
+                               || line.Contains("CCT") || line.Contains("CCC")
+                               || line.Contains("CCA") || line.Contains("CCG")
+                               || line.Contains("TCT") || line.Contains("TCC")
+                               || line.Contains("TCA") || line.Contains("TCG")
+                               || line.Contains("AGT") || line.Contains("AGC")
+                               || line.Contains("GTT") || line.Contains("GTC")
+                               || line.Contains("GTA") || line.Contains("GTG")
+                               || line.Contains("ATT") || line.Contains("ATA")
+                               || line.Contains("ATC") || line.Contains("TTA")
+                               || line.Contains("TTG") || line.Contains("CTT")
+                               || line.Contains("CTC") || line.Contains("CTA")
+                               || line.Contains("CTG") || line.Contains("TTT")
+                               || line.Contains("TTC"))
+                            {
+                                sb.AppendLine("No order for synthesizing!");
+                                continue;
+                            }
+                            else
+                            {
+                                sb.AppendLine($"Amino acid - {line} is not recognized! Removing!");
+                                ToRemove.Add(line);
+                                editedDNA = true;
+                                continue;
+                            }
+                        }              
+                    }
+                    writer.WriteLine(sb.ToString());
+
+                    if (editedDNA)
+                    {
+                        writer.Write("Flawed DNA: ");
+                        string flawed = string.Concat(DNA);
+                        writer.WriteLine(flawed);
+                        writer.WriteLine();
+                        for (int i = 0; i < ToRemove.Count; i++)
+                        {
+                            DNA.Remove(ToRemove[i]);
+                        }
+                        string dna = string.Concat(DNA);
+                        writer.Write("Edited DNA sequence: ");
+                        writer.WriteLine(dna);
+                    }                 
+                }
+            }
+        }
+
+        // Notes: (Adenin = Thymine && Guanine ≡ Cytosine); Codon = a pair of three bases = one amino acid
+        // All codons: (TTT,TTC) - Phenylalanine [TTY];
+        // (TTA, TTG {possible start codon} CTT, CTC, CTA, CTG) - Leucine [CTN, TTR; or CTY, YTR;];
+        // (ATT, ATC, ATA) - Isoleucine [ATH];
+        // ATG {start codone} - Methionine;
+        // (GTT, GTC, GTA, GTG {possible start codone}) - Valine [GTN]; 
+        // (TCT, TCC, TCA, TCG; AGT, AGC) - Serine [TCN, AGY];
+        // (CCT, CCC, CCA, CCG) - Proline [CCN];
+        // (ACT, ACC, ACA, ACG) - Threonine [ACN];
+        // (GCT, GCC, GCA, GCG) - Alanine [GCN];
+        // (TAT, TAC) - Tyrosine [TAY];
+        // (CAT, CAC) - Histidine [CAY];
+        // (CAA, CAG) - Glutamine [GAR];
+        // (AAT, AAC) - Asparagine [AAY];
+        // (AAA, AAG) - Lysine [AAR];
+        // (GAT, GAC) - Aspartic Acid [GAY];
+        // (GAA, GAG) - Glutamic Acid [GAR];
+        // (TGT, TGC) - Cysteine [TGY];
+        // (TGG) - Tryptophan;
+        // (CGT, CGC, CGA, CGG; AGA, AGG) - Arginine [CGN, AGR; or CGY, MGR;];
+        // (GGT, GGC, GGA, GGG) - Glycine [GGN];
+
+        // Start - ATG;
+        // Stop - TAA (ochre), TAG (amber), TGA (opal)
+    }
+}
