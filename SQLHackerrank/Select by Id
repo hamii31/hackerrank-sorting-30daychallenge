@@ -1,0 +1,2 @@
+Select * from City
+Where Id = 1661
