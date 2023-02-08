@@ -1,0 +1,3 @@
+Select * from City
+Where Population > 100000
+And CountryCode = "USA"
