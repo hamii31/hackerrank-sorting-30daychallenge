@@ -1,1 +1,0 @@
-Solutions for the hackerrank SQL challenge
