@@ -1,0 +1,68 @@
+
+using System.Diagnostics;
+
+namespace IonClock
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            Stopwatch s = Stopwatch.StartNew();
+            DateTime dateTime = DateTime.Now;
+            double EXPN = Math.Pow(10, -18);
+            Console.WriteLine($"Exponent of Al Ion: {EXPN:f18}");
+          
+            double ionUncertainty = 0.94 * EXPN;
+
+            double ticks = dateTime.Ticks * ionUncertainty;
+
+            Console.WriteLine("How this exponent affects time per tick:");
+
+            Console.WriteLine($"Attosecond: {ticks:f18}as");
+            string num = Convert.ToString($"{ticks:f18}");
+            num = num.Remove(num.Length - 3, 3);
+
+            Console.WriteLine($"Femtosecond: {ticks:f15}fs");
+            num = num.Remove(num.Length - 3, 3);
+
+            Console.WriteLine($"Picosecond: {ticks:f12}ps");
+            num = num.Remove(num.Length - 3, 3);
+
+            Console.WriteLine($"Nanosecond: {ticks:f9}ns");
+            num = num.Remove(num.Length - 3, 3);
+
+            Console.WriteLine($"Microsecond: {ticks:f6}µs");
+            num = num.Remove(num.Length - 3, 3);
+
+            Console.WriteLine($"Millisecond: {ticks:f3}ms");
+            num = num.Remove(num.Length - 1, 1);
+
+            Console.WriteLine($"Centrisecond: {ticks:f2}cs");
+            num = num.Remove(num.Length - 1, 1);
+
+            Console.WriteLine($"Decisecond: {ticks:f1}ds");
+
+            var samples = 50000;
+            TimeSpan ts = new TimeSpan();
+            double timespanned = 0;
+            for (int i = 0; i < samples; i+=10000)
+            {
+                ts = TimeSpan.FromMilliseconds(ticks * i);
+                timespanned = ticks * i;
+
+            }
+            long time = s.ElapsedTicks;
+            s.Stop();
+            s.Restart();
+            double wastedTime = (Convert.ToDouble(time) + 180000) / 10000;
+            Console.WriteLine($"Seconds wasted on the loop: {wastedTime:f18}s");
+            double secondsPassed = wastedTime - (timespanned / 1000);
+            Console.WriteLine(secondsPassed);
+            time = 0;
+            time = s.ElapsedTicks;
+            s.Stop();
+            secondsPassed -= time / 10000;
+            Console.WriteLine($"This is how many attoseconds passed while executing this code: {secondsPassed}as");
+        }
+    }
+}
