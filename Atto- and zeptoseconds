@@ -1,0 +1,25 @@
+using System.Diagnostics;
+
+namespace AdvancedStopwatch
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            DateTime date = DateTime.Now;
+            Stopwatch s = Stopwatch.StartNew();
+            while (date.Ticks < 10000) // 1 second = 10 000 ticks
+            {
+            }
+            s.Stop();
+            Console.WriteLine("How much time it took for the code to register 1 second passing by:");
+            Console.WriteLine($"{s.Elapsed.TotalMilliseconds} ms"); //milliseconds
+            Console.WriteLine($"{s.Elapsed.TotalMilliseconds * 1000} µs"); // microseconds
+            Console.WriteLine($"{s.Elapsed.TotalMilliseconds * 1000000} ns"); // nanoseconds
+            Console.WriteLine($"{s.Elapsed.TotalMilliseconds * 1000000000} ps"); // picoseconds
+            Console.WriteLine($"{s.Elapsed.TotalMilliseconds * 1000000000000} fs"); // femtoseconds
+            Console.WriteLine($"{s.Elapsed.TotalMilliseconds * 1000000000000000:f0} as"); //attoseconds
+            Console.WriteLine($"{s.Elapsed.TotalMilliseconds * 1000000000000000000:f0} zs"); //zeptoseconds
+        }
+    }
+}
