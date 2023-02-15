@@ -1,0 +1,2 @@
+Select Distinct city from station
+Where City Like '[aeiouAEIOU]%'
