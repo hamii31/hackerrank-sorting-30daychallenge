@@ -1,0 +1,9 @@
+Select City, Length(City) from Station
+Where Length(City) in (
+  Select max(Length(City))
+  from Station
+  Union
+  Select Min(Length(City))
+  from Station
+)
+Order By Length(City) DESC,City ASC Limit 2;
