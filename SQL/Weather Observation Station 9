@@ -1,0 +1,1 @@
+Select Distinct City from station where city not like '[aeiouAEIOU]%'
