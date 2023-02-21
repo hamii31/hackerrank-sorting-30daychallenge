@@ -1,0 +1,11 @@
+
+
+namespace MusicTinderApp.Models.Chatroom.Interfaces
+{
+    internal interface IChat
+    {
+        string FriendName { get; }
+
+        string Username { get; }
+    }
+}
