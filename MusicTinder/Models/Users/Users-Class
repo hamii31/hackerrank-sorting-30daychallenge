@@ -1,0 +1,349 @@
+
+using MusicTinderApp.Models.Users.Interface;
+
+namespace MusicTinderApp.Models.Users
+{
+    internal class Users : IUser
+    {
+        public List<string> genres = new List<string>();
+        private string firstName { get; set; }
+        private string lastName { get; set; }
+        private string username { get; set; }
+        private string email { get; set; }
+        private string password { get; set; }
+        private string gender { get; set; }
+        private string interestedIn { get; set; }
+        public string FirstName
+        {
+            get { return firstName; }
+            private set
+            {
+                if (string.IsNullOrEmpty(value))
+                {
+                   throw new ArgumentException("First name cannot be null or empty!");
+                };
+                firstName = value;
+            }
+        }
+
+        public string LastName
+        {
+            get { return lastName; }
+            private set
+            {
+                if (string.IsNullOrEmpty(value))
+                {
+                    throw new ArgumentException("Last name cannot be null or empty!");
+                };
+                lastName = value;
+            } 
+        }
+
+        public string Username
+        {
+            get { return username; }
+            private set
+            {
+                if (string.IsNullOrEmpty(value))
+                {
+                    throw new ArgumentException("Nick name cannot be null or empty!");
+                };
+                username = value;
+            } 
+        }
+
+        public string Email { get { return email; } private set
+            {
+                if (string.IsNullOrEmpty(value))
+                {
+                    throw new ArgumentException("Email cannot be null or empty!");
+                };
+                email = value;
+            } 
+        }
+
+        public string Password { get { return password; } private set 
+            {
+                if (string.IsNullOrEmpty(value))
+                {
+                    throw new ArgumentException("Password cannot be null or empty!");
+                };
+                password = value;
+            } 
+        }
+
+        public string Gender { get { return gender; } private set 
+            {
+                if (string.IsNullOrEmpty(value))
+                {
+                    throw new ArgumentException("Gender cannot be null or empty!");
+                };
+                gender = value;
+            } 
+        }
+
+        public string InterestedIn 
+        { get { return interestedIn; } 
+            private set 
+            {
+                if (string.IsNullOrEmpty(value))
+                {
+                    throw new ArgumentException("Cannot be null or empty!");
+                };
+                interestedIn = value;
+            } 
+        }
+
+        public Users()
+        {
+
+        }
+        public Users(Dictionary<string, List<string>> userinfo, Dictionary<string, string> logged, List<string> emails)
+        {
+            CreateUser(userinfo, logged, emails) ;
+        }
+      
+        private void CreateUser(Dictionary<string, List<string>> userinfo, Dictionary<string, string> logged, List<string> emails)
+        {
+            bool exception = false;
+            string username = string.Empty;
+            string password = string.Empty;
+            while (true)
+            {
+                try
+                {
+                    Console.Write("First name: ");
+                    var fname = Console.ReadLine();
+                    this.FirstName = fname;
+                    exception = false;
+                }
+                catch (ArgumentException e)
+                {
+                    Console.WriteLine(e.Message);
+                    exception = true;
+                    continue;
+                }
+                if (exception == false)
+                {
+                    break;
+                }
+            }
+
+            while (true)
+            {
+                try
+                {
+                    Console.Write("Last name: ");
+                    var lname = Console.ReadLine();
+                    this.LastName = lname;
+                    exception = false;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                    exception = true;
+                }
+                if (exception == false)
+                {
+                    break;
+                }
+            }
+
+            while (true)
+            {
+                try
+                {
+                    Console.Write("Username: ");
+                    var uname = Console.ReadLine();
+                    this.Username = uname;
+
+                    exception = false;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                    exception = true;
+                    continue;
+                }
+                if (exception == false)
+                {
+                    username = this.Username;
+                    break;
+                }
+            }
+
+            while (true)
+            {
+                try
+                {
+                    Console.Write("Email: ");
+                    var email = Console.ReadLine();
+                    this.Email = email;
+                    exception = false;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                    exception = true;
+                    continue;
+                }
+                if (exception == false)
+                {
+                    break;
+                }
+            }
+
+            while (true)
+            {
+                try
+                {
+                    Console.Write("Pass: ");
+                    var pass = Console.ReadLine();
+                    this.Password = pass;
+                    exception = false;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                    exception = true;
+                    continue;
+                }
+                if (exception == false)
+                {
+                    password = this.Password;
+                    break;
+                }
+            }
+
+            while (true)
+            {
+                try
+                {
+                    Console.Write("Gender: ");
+                    var gender = Console.ReadLine();
+                    this.Gender = gender;
+                    exception = false;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                    exception = true;
+                    continue;
+                }
+                if (exception == false)
+                {
+                    break;
+                }
+            }
+
+            while (true)
+            {
+                try
+                {
+                    Console.Write("Looking for (gender): ");
+                    var interestedIn = Console.ReadLine();
+                    this.InterestedIn = interestedIn;
+                    exception = false;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                    exception = true;
+                    continue;   
+                }
+                if (exception == false)
+                {
+                    break;
+                }
+            }
+
+            string[] input = new string[] { };
+            while (true)
+            {
+                Console.Write("What music do you like?: ");
+                input = Console.ReadLine().ToLower().Split(new char[] { '|', '.', ',', ' ' });
+
+                if (input.Length == 0 || string.IsNullOrWhiteSpace(input[0]))
+                {
+                    Console.WriteLine("Can't have an empty genre list!");
+                }
+                else
+                {
+                    break;
+                }
+            }
+            
+            if (!userinfo.ContainsKey(username))
+            {
+                userinfo[username] = new List<string>();
+                foreach (string genre in input)
+                {
+                    userinfo[username].Add(genre);
+                }
+                Console.WriteLine($"User {username} created!");
+            }
+            else
+            {
+                Console.WriteLine("User already exists!");
+            }
+            if (!logged.ContainsKey(username))
+            {
+                logged.Add(username, password);
+                Console.WriteLine("Profile created!");
+            }
+            else
+            {
+                Console.WriteLine("Profile already exists!");
+            }
+            if (!emails.Contains(Email))
+            {
+                emails.Add(Email);
+                Console.WriteLine("Email added!");
+            }
+            else
+            {
+                Console.WriteLine("Email already exists!");
+            }
+        }
+
+        public void AddFriend(string username, string friendToAdd, Dictionary<string, List<string>> friends)
+        {
+            if (!friends.ContainsKey(username))
+            {
+                friends[username] = new List<string>();
+                friends[username].Add(friendToAdd);
+                Console.WriteLine($"{friendToAdd} added to your friends list!");
+            }
+            else
+            {
+                Console.WriteLine("Friend already added!");
+            }
+        }
+
+        public bool CheckFriendList(string username, Dictionary<string, List<string>> friends, string command)
+        {
+            if (command == "any")
+            {
+                if (friends[username].Count == 0)
+                {
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
+            }
+            else
+            {
+                if (friends[username].Contains(command))
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
+    }
+}
