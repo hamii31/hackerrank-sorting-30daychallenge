@@ -1,0 +1,446 @@
+
+using MusicTinderApp.Models.Chatroom;
+using MusicTinderApp.Models.Users;
+using System.Text;
+
+namespace MusicTinderApp.Core
+{
+    internal class Engine
+    {
+        // TODO: Delete profile
+        private static List<string> Emails = new List<string>();
+        private static StringBuilder chatlog = new StringBuilder();
+        private static Dictionary<string, List<string>> UserInfo = new Dictionary<string, List<string>>(); // username + list of genres they like
+        private static Dictionary<string, string> LoggedProfiles = new Dictionary<string, string>(); // all current created profiles
+        private static Dictionary<string, List<string>> FriendList = new Dictionary<string, List<string>>(); // username + list of their friends
+        public void Run()
+        {
+            string loggedUname = string.Empty;
+
+            Console.WriteLine("===");
+            Console.WriteLine("Welcome to Music Tinder!");
+
+            loggedUname = InitialLoop();
+
+            while (true) // main loop
+            {
+                try
+                {
+                    Console.WriteLine("===");
+                    Console.WriteLine("Find new people! Just <search>their <username>! <Match> with random people by just liking the same genre of music! Or start a <chat> with your friends! You can update or delete your account from the <settings>!");
+                    Console.Write("Awaiting input: ");
+                    var input = Console.ReadLine().ToLower().Split(" ");
+
+                    switch (input[0])
+                    {
+                        case "search":
+                            Search(input, loggedUname);
+                            break;
+                        case "chat":
+                            if (FriendList.Count == 0)
+                            {
+                                Console.WriteLine("Friend list is empty!");
+                            }
+                            else
+                            {
+                                CreateChatroom(loggedUname);
+                            }
+                            break;
+                        case "match":
+                            Match(loggedUname, FriendList);
+                            break;
+                        case "settings":
+                            Console.WriteLine("<Update> your genre list, <change> your username or password, <delete> your account");
+                            var command = Console.ReadLine().ToLower();
+                            if (command == "update")
+                            {
+                               UpdateGenreList(loggedUname);
+                            }
+                            if (command == "delete")
+                            {
+                                DeleteAccount(LoggedProfiles);
+                            }
+                            if (command == "change")
+                            {
+                                Console.WriteLine("Do you want to change your <username> or <password>?");
+                                var answer = Console.ReadLine().ToLower();
+                                if (answer == "username")
+                                {
+                                    loggedUname = ChangeUsername(loggedUname);
+                                }
+                                else if (answer == "password")
+                                {
+                                    ChangePassword(loggedUname);
+                                }
+                            }
+                            break;
+                        default:
+                            Console.WriteLine("Command not recognised!");
+                            break;
+                    }
+                }
+                catch (Exception)
+                {
+                    Console.WriteLine("Error");
+                }
+            }
+        }
+        private string InitialLoop()
+        {
+            bool createdprofile = false;
+            bool loggedIn = false;
+            string loggedUname = string.Empty;
+            while (true) // initial profile(s) creation 
+            {
+                try
+                {
+                    if (createdprofile == false)
+                    {
+                        Console.WriteLine("(Log in) or (sign up)!");
+                    }
+                    else if (loggedIn)
+                    {
+                        Console.WriteLine("Let's (get started)!");
+                    }
+                    else
+                    {
+                        Console.WriteLine("(Log in) or (sign up)!");
+                    }
+                    string input = Console.ReadLine().ToLower();
+                    if (input == "log in")
+                    {
+                        Console.Write("Your username: ");
+                        var uname = Console.ReadLine();
+                        loggedUname = uname;
+                        Console.Write("Your password: ");
+                        var pass = Console.ReadLine();
+                        CheckIfLogged(uname, pass);
+                        loggedIn = true;
+                    }
+                    else if (input == "sign up")
+                    {
+                        Users user = new Users(UserInfo, LoggedProfiles, Emails);
+                        createdprofile = true;
+                    }
+                    else if (input == "get started" && loggedIn)
+                    {
+                        break;
+                    }
+                    else if (input == "get started" && !loggedIn)
+                    {
+                        Console.WriteLine("You're not logged in! Log in to get started!");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Command not recognised!");
+                    }
+                }
+                catch (ArgumentException e)
+                {
+                    Console.WriteLine(e.Message);
+                    continue;
+                }
+            }
+            return loggedUname;
+        }
+        private bool FindNewPeople(string username)
+        {
+            if (LoggedProfiles.ContainsKey(username))
+            {
+                Console.WriteLine("User found!");
+                foreach (var (name, c) in UserInfo)
+                {
+                    if (name == username)
+                    {
+                        Console.Write($"{name} likes: ");
+                        Console.Write(string.Join(", ", c));
+                        Console.WriteLine();
+                    }
+                }
+                return true;
+            }
+            else
+            {
+                Console.WriteLine("User not found!");
+                return false;
+            }
+        }
+        private void CheckIfLogged(string username, string password)
+        {
+            bool exists = false;
+            foreach (var profile in LoggedProfiles)
+            {
+                if (profile.Key == username && profile.Value == password)
+                {
+                    Console.WriteLine($"{profile.Key} successfully logged in!");
+                    exists = true;
+                    break;
+                }
+            }
+            if (exists == false)
+            {
+                Console.WriteLine("Please type in your email address");
+                var email = Console.ReadLine();
+                if (Emails.Contains(email))
+                {
+                    Console.WriteLine("Email found! We'll contact you for retrieving your profile!");
+                }
+                else
+                {
+                    Console.WriteLine("Profile doesn't exist!");
+                }
+            }
+        }
+        private void Match(string username, Dictionary<string, List<string>> friends)
+        {
+            List<string> genres = new List<string>();
+            foreach (var item in UserInfo)
+            {
+                if (item.Key == username)
+                {
+                    genres = item.Value;
+                }
+            }
+            bool matchFound = false;
+            foreach (var (name, g) in UserInfo)
+            {
+                if (matchFound)
+                {
+                    break;
+                }
+                if (name != username && !friends[username].Contains(name))
+                {
+                    foreach (var genre in genres)
+                    {
+                        if (g.Contains(genre))
+                        {
+                            Console.WriteLine($"Match found! You and {name} both like {genre}!");
+                            matchFound = true;
+                            break;
+                        }
+                    }
+                }
+            }
+            if (!matchFound)
+            {
+                Console.WriteLine("Sorry, no match found! Maybe change up your genre list and you'll have a match?");
+            }
+        }
+        private void UpdateGenreList(string loggedUname)
+        {
+            Console.Write("Type in what genre you want to add: ");
+            var genre = Console.ReadLine().ToLower().Split(" ");
+            if (string.IsNullOrEmpty(genre[0]))
+            {
+                Console.WriteLine("Genre field cannot be empty!");
+            }
+            else
+            {
+                if (genre.Length < 1)
+                {
+                    UserInfo[loggedUname].Add(genre[0]);
+                    foreach (var item in UserInfo)
+                    {
+                        if (item.Key == loggedUname)
+                        {
+                            Console.Write("Updated genre list: ");
+                            Console.Write(string.Join(", ", item.Value));
+                            Console.WriteLine();
+                        }
+                    }
+                }
+                else
+                {
+                    foreach (var item in genre)
+                    {
+                        if (UserInfo[loggedUname].Contains(item))
+                        {
+
+                        }
+                        else
+                        {
+                            UserInfo[loggedUname].Add(item);
+                        }
+                    }
+                    foreach (var item in UserInfo)
+                    {
+                        if (item.Key == loggedUname)
+                        {
+                            Console.Write("Updated genre list: ");
+                            Console.Write(string.Join(", ", item.Value));
+                            Console.WriteLine();
+                        }
+                    }
+                }
+            }
+        }
+        private void CreateChatroom(string loggedUname)
+        {
+            Users users = new Users();
+            if (users.CheckFriendList(loggedUname, FriendList, "any"))
+            {
+                foreach (var item in FriendList)
+                {
+                    if (item.Key == loggedUname)
+                    {
+                        Console.WriteLine($"Total friends online: {item.Value.Count}");
+                    }
+                }
+                Console.WriteLine("Chat with: (type in friend name)");
+                var name = Console.ReadLine();
+                if (users.CheckFriendList(loggedUname, FriendList, name))
+                {
+                    Chat chat = new Chat(name, loggedUname, chatlog);
+                }
+                else
+                {
+                    Console.WriteLine($"{name} does not exist in your friend list!");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Friend list empty!");
+            }
+        }
+        private void Search(string[] input, string loggedUname)
+        {
+            if (input.Length < 1 || string.IsNullOrEmpty(input[1]))
+            {
+                Console.WriteLine("No username to search!");
+            }
+            if (input[1] == loggedUname)
+            {
+                Console.WriteLine("Cannot search for yourself!");
+            }
+            else
+            {
+                if (FindNewPeople(input[1]))
+                {
+                    Console.WriteLine("Do you want to add the user to your friend list? Y/N");
+                    string answer = Console.ReadLine().ToLower();
+                    if (answer == "y")
+                    {
+                        Users user = new Users();
+                        user.AddFriend(loggedUname, input[1], FriendList);
+                        Console.WriteLine("Your current friends: ");
+                        foreach (var item in FriendList)
+                        {
+                            if (item.Key == loggedUname)
+                            {
+                                Console.WriteLine(string.Join(", ", item.Value));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        private void DeleteAccount(Dictionary<string, string> loggedProfiles)
+        {
+            Console.WriteLine("Are you sure you want to delete your account? Y/N");
+            var answer = Console.ReadLine().ToLower();
+            if (answer == "y")
+            {
+                Console.WriteLine("Enter your username and password with a space between them");
+                var check = Console.ReadLine().Split(" ");
+                if (loggedProfiles.ContainsKey(check[0]))
+                {
+                    if (loggedProfiles[check[0]].Contains(check[1]))
+                    {
+                        Console.WriteLine("Profile succesfully deleted!");
+                        loggedProfiles.Remove(check[0]);
+                        InitialLoop();
+                    }
+                }
+            }
+        }
+        private string ChangeUsername(string loggedUname)
+        {
+            var userValue = UserInfo[loggedUname];
+            var loggedValue = LoggedProfiles[loggedUname];
+            List<string> friendsValue = new List<string>();
+
+            UserInfo.Remove(loggedUname);
+            LoggedProfiles.Remove(loggedUname);
+
+            if (FriendList.Count > 0)
+            {
+                friendsValue = FriendList[loggedUname];
+                FriendList.Remove(loggedUname);
+            }
+
+            Console.WriteLine("Type in your new desired username: ");
+            var uname = Console.ReadLine();
+            loggedUname = uname;
+
+            if (!UserInfo.ContainsKey(loggedUname))
+            {
+                UserInfo[loggedUname] = userValue;
+            }
+            if (!LoggedProfiles.ContainsKey(loggedUname))
+            {
+                LoggedProfiles.Add(loggedUname, loggedValue);
+            }
+            if (!FriendList.ContainsKey(loggedUname))
+            {
+                FriendList[loggedUname] = friendsValue;
+            }
+            Console.WriteLine($"Username changed to {loggedUname}!");
+            //Console.WriteLine("User logged with password: "); - UNCOMMENT TO CHECK IF ALL DATA HAS BEEN ADDED CORRECTLY
+            //foreach (var item in LoggedProfiles)
+            //{
+            //    if (item.Key == loggedUname)
+            //    {
+            //        Console.WriteLine(item.Value);
+            //    }
+            //}
+            //Console.WriteLine("Your genres: ");
+            //foreach (var item in UserInfo)
+            //{
+            //    if (item.Key == loggedUname)
+            //    {
+            //        Console.WriteLine(string.Join(", ", item.Value));
+            //    }
+            //}
+            //if (FriendList.Count > 0)
+            //{
+            //    Console.WriteLine("Your friends: ");
+            //    foreach (var item in FriendList)
+            //    {
+            //        if (item.Key == loggedUname)
+            //        {
+            //            Console.WriteLine(string.Join(", ", item.Value));
+            //        }
+            //    }
+            //}
+            return loggedUname;
+           
+        }
+        private void ChangePassword(string loggedUname)
+        {
+            Console.WriteLine("Type in your email address:");
+            var email = Console.ReadLine();
+            if (Emails.Contains(email))
+            {
+                Console.WriteLine("Email is valid! Choose your new password!");
+                while (true)
+                {
+                    var currentPass = LoggedProfiles[loggedUname];
+                    var newPass = Console.ReadLine();
+                    if (currentPass == newPass)
+                    {
+                        Console.WriteLine("New password cannot be the same as the old password!");
+                    }
+                    else
+                    {
+                        LoggedProfiles.Remove(loggedUname);
+                        LoggedProfiles.Add(loggedUname, newPass);
+                        //var pass = LoggedProfiles[loggedUname]; UNCOMMENT TO SEE IF DATA WAS CHANGED CORRECTLY
+                        //Console.WriteLine($"New pass: {pass}");
+                        Console.WriteLine("Password successfully changed!");
+                        break;
+                    }
+                }
+            }
+        }
+    }
+}
