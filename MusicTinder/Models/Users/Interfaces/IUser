@@ -1,0 +1,16 @@
+
+
+namespace MusicTinderApp.Models.Users.Interface
+{
+    internal interface IUser
+    {
+        string FirstName { get; }
+        string LastName { get; }
+        string Username { get; }
+        string Email { get; }
+        string Password { get; }
+
+        string Gender { get; }
+        string InterestedIn { get; }
+    }
+}
