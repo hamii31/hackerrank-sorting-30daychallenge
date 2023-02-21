@@ -1,0 +1,14 @@
+using MusicTinderApp.Core;
+
+namespace MusicTinderApp
+{
+    public class Program
+    {
+        static void Main(string[] args)
+        {
+            Console.WriteLine("Music Tinder starting!");
+            Engine engine = new Engine();
+            engine.Run();
+        }
+    }
+}
