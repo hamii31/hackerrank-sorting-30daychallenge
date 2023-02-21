@@ -1,0 +1,53 @@
+using MusicTinderApp.Models.Chatroom.Interfaces;
+using System.Text;
+
+namespace MusicTinderApp.Models.Chatroom
+{
+    internal class Chat : IChat
+    {
+        public string FriendName { get; set; }
+
+        public string Username { get; set; }
+
+        public Chat(string friendName, string username, StringBuilder sb)
+        {
+            FriendName = friendName;
+            Username = username;
+            Chatroom(FriendName, Username, sb);
+        }
+        private void Chatroom(string friendName, string username, StringBuilder sb)
+        {
+            var inputfile = @"C:\Users\Hami\source\repos\MusicTinderApp\MusicTinderApp\Models\Chatroom\Chatlog\input.txt";
+            var outputfile = @"C:\Users\Hami\source\repos\MusicTinderApp\MusicTinderApp\Models\Chatroom\Chatlog\chatlog.txt";
+            using (StreamReader reader = new StreamReader(inputfile))
+            {
+                using (StreamWriter writer = new StreamWriter(outputfile))
+                {
+                    var time = DateTime.Now.ToString("hh:mm:ss tt");
+                    var date = DateTime.Now.ToShortDateString();
+                    sb.AppendLine($"Chat started between: {friendName} and {username} at {time} on {date}");
+
+                    while (true)
+                    {
+                        Console.WriteLine("Your message:");
+                        var input = Console.ReadLine();
+                        Console.WriteLine("Their message:");
+                        var friendInput = reader.ReadLine();
+                        Console.WriteLine(friendInput);
+                        if (input == string.Empty)
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            sb.AppendLine(username + ">" + input);
+                            sb.AppendLine(friendName + ">" + friendInput);
+                        }
+                    }
+                    writer.WriteLine(sb.ToString());
+                    writer.Flush();
+                }
+            }
+        }
+    }
+}
