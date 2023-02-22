@@ -78,7 +78,11 @@ namespace Drone
                     Console.WriteLine($"Connection to {drone.Name} lost! Mission failure!");
                     break;
                 }
-
+                if (drone.HitTheGround)
+                {
+                    Console.WriteLine($"{drone.Name} fell to the ground! Mission failure!");
+                    break;
+                }
                 Console.Write("Awaiting commands: ");
                 string command = Console.ReadLine();
                 switch (command)
