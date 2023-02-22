@@ -1,0 +1,1261 @@
+
+
+
+namespace Drone
+{
+    public class Radar
+    {
+        public int MapHeight { get; set; }
+        public int MapWidth { get; set; }
+
+        public int EnemyX { get; set; }
+        public int EnemyY { get; set; }
+
+        public int BaseX { get; set; }
+        public int BaseY { get; set; }
+
+        public int DroneX { get; set; } // width
+        public int DroneY { get; set; } // height
+
+        public int hasTurnedLeft { get; set; }
+        public bool justTurnedLeft = false;
+        public int enemyAltitude { get; set; }
+        public int hasTurnedRight { get; set; }
+        public bool justTurnedRight = false;
+
+        public bool didAturn = false;
+
+        public bool targetLock = false;
+
+        public bool SignalLost = false;
+
+        public string[,] RadarHolder = new string[0, 0];
+
+        public Radar(int mapHeight, int mapWidth, int x, int y, int basex, int basey) 
+        {
+            this.MapHeight = mapHeight;
+            this.MapWidth = mapWidth;
+            this.EnemyX = x;
+            this.EnemyY = y;
+            this.BaseX = basex;
+            this.BaseY = basey;
+            this.DroneX = basex;
+            this.DroneY = basey;
+
+            CreateRadar(MapHeight, MapWidth, EnemyX, EnemyY, BaseX, BaseY);
+        }
+        void CreateRadar(int mapHeight, int mapWidth, int x, int y, int basex, int basey)
+        {
+            string[,] radar = new string[mapHeight, mapWidth];
+
+            for (int  r = 0;  r < mapHeight;  r++)
+            {
+                for (int c = 0; c < mapWidth; c++)
+                {
+                    if (r == 0)
+                    {
+                        radar[r, c] = "=";
+                    }
+                    else if (r == 19)
+                    {
+                        radar[r, c] = "=";
+                    }
+                    else if (c == 0)
+                    {
+                        radar[r, c] = "=";
+                    }
+                    else if (c == 19)
+                    {
+                        radar[r, c] = "=";
+                    }
+                    else
+                    {
+                        radar[r, c] = "-";
+                    }
+                }
+            }
+            Random rnd = new Random();
+            var target1Y = rnd.Next(3, 17);
+            var target1X = rnd.Next(3, 17);
+            var target2Y = rnd.Next(3, 17);
+            var target2X = rnd.Next(3, 17);
+            SetEnemyAltitude();
+            // target and base marking 
+            for (int r = 0; r < mapHeight; r++)
+            {
+                for (int c = 0; c < mapWidth; c++)
+                {
+                    if (r == y && c == x)
+                    {
+                        radar[r, c] = "X";
+                    }
+                    if (r == basey && c == basex)
+                    {
+                        radar[r, c] = "A";
+                    }
+                    if (r == target1Y && c == target1X)
+                    {
+                        radar[r, c] = "T";
+                    }
+                    if (r == target2Y && c == target2X)
+                    {
+                        radar[r, c] = "T";
+                    }
+                }
+            }  
+            RadarHolder = radar;
+        }
+
+        private bool InRange(int altitude)
+        {
+            if (altitude + 3000 <= enemyAltitude || altitude - 3000 >= enemyAltitude)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        private void SetEnemyAltitude()
+        {
+            Random rnd = new Random();
+            enemyAltitude = rnd.Next(1000, 5000);
+            Console.WriteLine($"Enemy planes spotted at {enemyAltitude}m");
+        }
+        public void ShowRadar(string[,] radar)
+        {
+            for (int r = 0; r < radar.GetLength(0); r++)
+            {
+                for (int c = 0; c < radar.GetLength(1); c++)
+                {
+                    Console.Write(radar[r, c] + " ");
+                }
+                Console.WriteLine();
+            }
+        }
+        public void CurrentLocationOnRadar(string[,] radar, int x, int y, string direction, int speed, int altitude) 
+        {
+            radar[BaseY, BaseX] = "A"; // saves location of base and removes duplicates 
+            for (int r = 0; r < radar.GetLength(0); r++)
+            {
+                for (int c = 0; c < radar.GetLength(1); c++) 
+                {
+                    if (radar[r, c] == "D")
+                    {
+                        radar[r, c] = "-";
+                    }
+                }
+            }
+            if (direction == "forward")
+            {
+                if (hasTurnedRight != 0 || hasTurnedLeft != 0 && DroneX - 1 <= 0 || DroneX + 1 >= 20 || DroneY - 1 <= 0 || DroneY + 1 >= 19)
+                {
+                    targetLock = false;
+                    for (int r = 0; r < radar.GetLength(0); r++)
+                    {
+                        if (didAturn == true)
+                        {
+                            didAturn = false;
+                            break;
+                        }
+                        for (int c = 0; c < radar.GetLength(1); c++)
+                        {
+                            if (r == y && c == x && hasTurnedLeft == 1
+                                || hasTurnedRight == 3)
+                            {
+                                justTurnedLeft = false;
+                                didAturn = true;
+                                if (speed < 500)
+                                {
+                                    DroneY += 1;
+                                    radar[DroneY, DroneX] = "D";
+                                    if (radar[DroneY + 1, DroneX] == "X" || radar[DroneY + 1, DroneX] == "T")
+                                    {
+                                        if (InRange(altitude))
+                                        {
+                                            Console.WriteLine("Target Lock!");
+                                            radar[DroneY + 1, DroneX] = "-";
+                                            targetLock = true;
+                                        }
+                                        else
+                                        {
+                                            if (radar[DroneY + 1, DroneX] == "X")
+                                            {
+                                                radar[DroneY + 1, DroneX] = "X";
+                                                Console.WriteLine($"Enemy out of range! Enemy altitude - {enemyAltitude}");
+                                            }
+                                            else
+                                            {
+                                                radar[DroneY + 1, DroneX] = "T";
+                                                Console.WriteLine($"Enemy out of range! Enemy altitude - {enemyAltitude}");
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("Clear Sky!");
+                                    }
+                                    break;
+                                }
+                                else if (speed > 500 && speed < 1000)
+                                {
+                                    DroneY += 2;
+                                    radar[DroneY, DroneX] = "D";
+                                    if (radar[DroneY + 2, DroneX] == "X" || radar[DroneY + 2, DroneX] == "T")
+                                    {
+                                        if (InRange(altitude))
+                                        {
+                                            Console.WriteLine("Target Lock!");
+                                            radar[DroneY + 2, DroneX] = "-";
+                                            targetLock = true;
+                                        }
+                                        else
+                                        {
+                                            if (radar[DroneY + 2, DroneX] == "X")
+                                            {
+                                                radar[DroneY + 2, DroneX] = "X";
+                                                Console.WriteLine($"Enemy out of range! Enemy altitude - {enemyAltitude}");
+                                            }
+                                            else
+                                            {
+                                                radar[DroneY + 2, DroneX] = "T";
+                                                Console.WriteLine($"Enemy out of range! Enemy altitude - {enemyAltitude}");
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("Clear Sky!");
+                                    }
+                                    break;
+                                }
+                                else
+                                {
+                                    DroneY += 3;
+                                    radar[DroneY, DroneX] = "D";
+                                    if (radar[DroneY + 3, DroneX] == "X" || radar[DroneY + 3, DroneX] == "T")
+                                    {
+                                        if (InRange(altitude))
+                                        {
+                                            Console.WriteLine("Target Lock!");
+                                            radar[DroneY + 3, DroneX] = "-";
+                                            targetLock = true;
+                                        }
+                                        else
+                                        {
+                                            if (radar[DroneY + 3, DroneX] == "X")
+                                            {
+                                                radar[DroneY + 3, DroneX] = "X";
+                                                Console.WriteLine($"Enemy out of range! Enemy altitude - {enemyAltitude}");
+                                            }
+                                            else
+                                            {
+                                                radar[DroneY + 3, DroneX] = "T";
+                                                Console.WriteLine($"Enemy out of range! Enemy altitude - {enemyAltitude}");
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("Clear Sky!");
+                                    }
+                                    break;
+                                }
+                            }
+                            if (r == y && c == x && hasTurnedLeft == 3 && hasTurnedRight == 0
+                                || hasTurnedRight == 1
+                                || hasTurnedRight == 2 && hasTurnedLeft == 1
+                                || hasTurnedLeft == 2 && hasTurnedRight == 1)
+                            {
+                                justTurnedLeft = false;
+                                didAturn = true;
+                                if (speed < 500)
+                                {
+                                    DroneY -= 1;
+                                    radar[DroneY, DroneX] = "D";
+                                    if (radar[DroneY - 1, DroneX] == "X" || radar[DroneY - 1, DroneX] == "T")
+                                    {
+                                        if (InRange(altitude))
+                                        {
+                                            Console.WriteLine("Target Lock!");
+                                            radar[DroneY - 1, DroneX] = "-";
+                                            targetLock = true;
+                                        }
+                                        else
+                                        {
+                                            if (radar[DroneY - 1, DroneX] == "X")
+                                            {
+                                                radar[DroneY - 1, DroneX] = "X";
+                                                Console.WriteLine($"Enemy out of range! Enemy altitude - {enemyAltitude}");
+                                            }
+                                            else
+                                            {
+                                                radar[DroneY - 1, DroneX] = "T";
+                                                Console.WriteLine($"Enemy out of range! Enemy altitude - {enemyAltitude}");
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("Clear Sky!");
+                                    }
+                                    break;
+                                }
+                                else if (speed > 500 && speed < 1000)
+                                {
+                                    DroneY -= 2;
+                                    radar[DroneY, DroneX] = "D";
+                                    if (radar[DroneY - 2, DroneX] == "X" || radar[DroneY - 2, DroneX] == "T")
+                                    {
+                                        if (InRange(altitude))
+                                        {
+                                            Console.WriteLine("Target Lock!");
+                                            radar[DroneY - 2, DroneX] = "-";
+                                            targetLock = true;
+                                        }
+                                        else
+                                        {
+                                            if (radar[DroneY - 2, DroneX] == "X")
+                                            {
+                                                radar[DroneY - 2, DroneX] = "X";
+                                                Console.WriteLine($"Enemy out of range! Enemy altitude - {enemyAltitude}");
+                                            }
+                                            else
+                                            {
+                                                radar[DroneY - 2, DroneX] = "T";
+                                                Console.WriteLine($"Enemy out of range! Enemy altitude - {enemyAltitude}");
+                                            }
+                                            
+                                        }
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("Clear Sky!");
+                                    }
+                                    break;
+                                }
+                                else
+                                {
+                                    DroneY -= 3;
+                                    radar[DroneY, DroneX] = "D";
+                                    if (radar[DroneY - 3, DroneX] == "X" || radar[DroneY - 3, DroneX] == "T")
+                                    {
+                                        if (InRange(altitude))
+                                        {
+                                            Console.WriteLine("Target Lock!");
+                                            radar[DroneY - 3, DroneX] = "-";
+                                            targetLock = true;
+                                        }
+                                        else
+                                        {
+                                            if (radar[DroneY - 3, DroneX] == "X")
+                                            {
+                                                radar[DroneY - 3, DroneX] = "X";
+                                                Console.WriteLine($"Enemy out of range! Enemy altitude - {enemyAltitude}");
+                                            }
+                                            else
+                                            {
+                                                radar[DroneY - 3, DroneX] = "T";
+                                                Console.WriteLine($"Enemy out of range! Enemy altitude - {enemyAltitude}");
+                                            }                                      
+                                        }
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("Clear Sky!");
+                                    }
+                                    break;
+                                }
+                            }
+                            if (r == y && c == x && hasTurnedRight == 2
+                                || hasTurnedLeft == 2
+                                || hasTurnedLeft == 3 && hasTurnedRight == 1)
+                            {
+                                justTurnedRight = false;
+                                didAturn = true;
+                                if (speed < 500)
+                                {
+                                    DroneX += 1;
+                                    radar[DroneY, DroneX] = "D";
+                                    if (radar[DroneY, DroneX + 1] == "X" || radar[DroneY, DroneX + 1] == "T")
+                                    {
+                                        if (InRange(altitude))
+                                        {
+                                            Console.WriteLine("Target Lock!");
+                                            radar[DroneY, DroneX + 1] = "-";
+                                            targetLock = true;
+                                        }
+                                        else
+                                        {
+                                            if (radar[DroneY, DroneX + 1] == "X")
+                                            {
+                                                radar[DroneY, DroneX + 1] = "X";
+                                                Console.WriteLine($"Enemy out of range! Enemy altitude - {enemyAltitude}");
+                                            }
+                                            else
+                                            {
+                                                radar[DroneY, DroneX + 1] = "T";
+                                                Console.WriteLine($"Enemy out of range! Enemy altitude - {enemyAltitude}");
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("Clear Sky!");
+                                    }
+                                    break;
+                                }
+                                else if (speed > 500 && speed < 1000)
+                                {
+                                    DroneX += 2;
+                                    radar[DroneY, DroneX] = "D";
+                                    if (radar[DroneY, DroneX + 2] == "X" || radar[DroneY, DroneX + 2] == "T")
+                                    {
+                                        if (InRange(altitude))
+                                        {
+                                            Console.WriteLine("Target Lock!");
+                                            radar[DroneY, DroneX + 2] = "-";
+                                            targetLock = true;
+                                        }
+                                        else
+                                        {
+                                            if (radar[DroneY, DroneX + 2] == "X")
+                                            {
+                                                radar[DroneY, DroneX + 2] = "X";
+                                                Console.WriteLine($"Enemy out of range! Enemy altitude - {enemyAltitude}");
+                                            }
+                                            else
+                                            {
+                                                radar[DroneY, DroneX + 2] = "T";
+                                                Console.WriteLine($"Enemy out of range! Enemy altitude - {enemyAltitude}");
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("Clear Sky!");
+                                    }
+                                    break;
+                                }
+                                else
+                                {
+                                    DroneX += 3;
+                                    radar[DroneY, DroneX] = "D";
+                                    if (radar[DroneY, DroneX + 3] == "X" || radar[DroneY, DroneX + 3] == "T")
+                                    {
+                                        if (InRange(altitude))
+                                        {
+                                            Console.WriteLine("Target Lock!");
+                                            radar[DroneY, DroneX + 3] = "-";
+                                            targetLock = true;
+                                        }
+                                        else
+                                        {
+                                            if (radar[DroneY, DroneX + 3] == "X")
+                                            {
+                                                radar[DroneY, DroneX + 3] = "X";
+                                                Console.WriteLine($"Enemy out of range! Enemy altitude - {enemyAltitude}");
+                                            }
+                                            else
+                                            {
+                                                radar[DroneY, DroneX + 3] = "T";
+                                                Console.WriteLine($"Enemy out of range! Enemy altitude - {enemyAltitude}");
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("Clear Sky!");
+                                    }
+                                    break;
+                                }
+                            }
+                            else if (r == y && c == x)
+                            {
+                                didAturn = true;
+                                if (speed < 500)
+                                {
+                                    DroneX -= 1;
+                                    radar[DroneY, DroneX] = "D";
+                                    if (radar[DroneY, DroneX - 1] == "X" || radar[DroneY, DroneX - 1] == "T")
+                                    {
+                                        if (InRange(altitude))
+                                        {
+                                            Console.WriteLine("Target Lock!");
+                                            radar[DroneY, DroneX - 1] = "-";
+                                            targetLock = true;
+                                        }
+                                        else
+                                        {
+                                            if (radar[DroneY, DroneX - 1] == "X")
+                                            {
+                                                radar[DroneY, DroneX - 1] = "X";
+                                                Console.WriteLine($"Enemy out of range! Enemy altitude - {enemyAltitude}");
+                                            }
+                                            else
+                                            {
+                                                radar[DroneY, DroneX - 1] = "T";
+                                                Console.WriteLine($"Enemy out of range! Enemy altitude - {enemyAltitude}");
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("Clear Sky!");
+                                    }
+                                    break;
+                                }
+                                else if (speed > 500 && speed < 1000)
+                                {
+                                    DroneX -= 2;
+                                    radar[DroneY, DroneX] = "D";
+                                    if (radar[DroneY, DroneX - 2] == "X" || radar[DroneY, DroneX - 2] == "T")
+                                    {
+                                        if (InRange(altitude))
+                                        {
+                                            Console.WriteLine("Target Lock!");
+                                            radar[DroneY, DroneX - 2] = "-";
+                                            targetLock = true;
+                                        }
+                                        else
+                                        {
+                                            if (radar[DroneY, DroneX - 2] == "X")
+                                            {
+                                                radar[DroneY, DroneX - 2] = "X";
+                                                Console.WriteLine($"Enemy out of range! Enemy altitude - {enemyAltitude}");
+                                            }
+                                            else
+                                            {
+                                                radar[DroneY, DroneX - 2] = "T";
+                                                Console.WriteLine($"Enemy out of range! Enemy altitude - {enemyAltitude}");
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("Clear Sky!");
+                                    }
+                                    break;
+                                }
+                                else
+                                {
+                                    DroneX -= 3;
+                                    radar[DroneY, DroneX] = "D";
+                                    if (radar[DroneY, DroneX - 3] == "X" || radar[DroneY, DroneX - 3] == "T")
+                                    {
+                                        if (InRange(altitude))
+                                        {
+                                            Console.WriteLine("Target Lock!");
+                                            radar[DroneY, DroneX - 3] = "-";
+                                            targetLock = true;
+                                        }
+                                        else
+                                        {
+                                            if (radar[DroneY, DroneX - 3] == "X")
+                                            {
+                                                radar[DroneY, DroneX - 3] = "X";
+                                                Console.WriteLine($"Enemy out of range! Enemy altitude - {enemyAltitude}");
+                                            }
+                                            else
+                                            {
+                                                radar[DroneY, DroneX - 3] = "T";
+                                                Console.WriteLine($"Enemy out of range! Enemy altitude - {enemyAltitude}");
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("Clear Sky!");
+                                    }
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                else if (hasTurnedRight == 0 && hasTurnedLeft == 0 && DroneX - 1 <= 0 || DroneX + 1 >= 20 || DroneY - 1 <= 0 || DroneY + 1 >= 19)
+                {
+                    SignalLost = true;
+                }
+                else
+                {
+                    targetLock = false;
+                    for (int r = 0; r < radar.GetLength(0); r++)
+                    {
+                        if (didAturn == true)
+                        {
+                            didAturn = false;
+                            break;
+                        }
+                        for (int c = 0; c < radar.GetLength(1); c++)
+                        {
+                            if (r == y && c == x && hasTurnedLeft == 1
+                                || hasTurnedRight == 3)
+                            {
+                                justTurnedLeft = false;
+                                didAturn = true;
+                                if (speed < 500)
+                                {
+                                    DroneY += 1;
+                                    radar[DroneY, DroneX] = "D";
+                                    if (radar[DroneY + 1, DroneX] == "X" || radar[DroneY + 1, DroneX] == "T")
+                                    {
+                                        if (InRange(altitude))
+                                        {
+                                            Console.WriteLine("Target Lock!");
+                                            radar[DroneY + 1, DroneX] = "-";
+                                            targetLock = true;
+                                        }
+                                        else
+                                        {
+                                            if (radar[DroneY + 1, DroneX] == "X")
+                                            {
+                                                radar[DroneY + 1, DroneX] = "X";
+                                                Console.WriteLine($"Enemy out of range! Enemy altitude - {enemyAltitude}");
+                                            }
+                                            else
+                                            {
+                                                radar[DroneY + 1, DroneX] = "T";
+                                                Console.WriteLine($"Enemy out of range! Enemy altitude - {enemyAltitude}");
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("Clear Sky!");
+                                    }
+                                    break;
+                                }
+                                else if (speed > 500 && speed < 1000)
+                                {
+                                    DroneY += 2;
+                                    radar[DroneY, DroneX] = "D";
+                                    if (radar[DroneY + 2, DroneX] == "X" || radar[DroneY + 2, DroneX] == "T")
+                                    {
+                                        if (InRange(altitude))
+                                        {
+                                            Console.WriteLine("Target Lock!");
+                                            radar[DroneY + 2, DroneX] = "-";
+                                            targetLock = true;
+                                        }
+                                        else
+                                        {
+                                            if (radar[DroneY + 2, DroneX] == "X")
+                                            {
+                                                radar[DroneY + 2, DroneX] = "X";
+                                                Console.WriteLine($"Enemy out of range! Enemy altitude - {enemyAltitude}");
+                                            }
+                                            else
+                                            {
+                                                radar[DroneY + 2, DroneX] = "T";
+                                                Console.WriteLine($"Enemy out of range! Enemy altitude - {enemyAltitude}");
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("Clear Sky!");
+                                    }
+                                    break;
+                                }
+                                else
+                                {
+                                    DroneY += 3;
+                                    radar[DroneY, DroneX] = "D";
+                                    if (radar[DroneY + 3, DroneX] == "X" || radar[DroneY + 3, DroneX] == "T")
+                                    {
+                                        if (InRange(altitude))
+                                        {
+                                            Console.WriteLine("Target Lock!");
+                                            radar[DroneY + 3, DroneX] = "-";
+                                            targetLock = true;
+                                        }
+                                        else
+                                        {
+                                            if (radar[DroneY + 3, DroneX] == "X")
+                                            {
+                                                radar[DroneY + 3, DroneX] = "X";
+                                                Console.WriteLine($"Enemy out of range! Enemy altitude - {enemyAltitude}");
+                                            }
+                                            else
+                                            {
+                                                radar[DroneY + 3, DroneX] = "T";
+                                                Console.WriteLine($"Enemy out of range! Enemy altitude - {enemyAltitude}");
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("Clear Sky!");
+                                    }
+                                    break;
+                                }
+                            }
+                            if (r == y && c == x && hasTurnedLeft == 3 && hasTurnedRight == 0
+                                || hasTurnedRight == 1
+                                || hasTurnedRight == 2 && hasTurnedLeft == 1
+                                || hasTurnedLeft == 2 && hasTurnedRight == 1)
+                            {
+                                justTurnedLeft = false;
+                                didAturn = true;
+                                if (speed < 500)
+                                {
+                                    DroneY -= 1;
+                                    radar[DroneY, DroneX] = "D";
+                                    if (radar[DroneY - 1, DroneX] == "X" || radar[DroneY - 1, DroneX] == "T")
+                                    {
+                                        if (InRange(altitude))
+                                        {
+                                            Console.WriteLine("Target Lock!");
+                                            radar[DroneY - 1, DroneX] = "-";
+                                            targetLock = true;
+                                        }
+                                        else
+                                        {
+                                            if (radar[DroneY - 1, DroneX] == "X")
+                                            {
+                                                radar[DroneY - 1, DroneX] = "X";
+                                                Console.WriteLine($"Enemy out of range! Enemy altitude - {enemyAltitude}");
+                                            }
+                                            else
+                                            {
+                                                radar[DroneY - 1, DroneX] = "T";
+                                                Console.WriteLine($"Enemy out of range! Enemy altitude - {enemyAltitude}");
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("Clear Sky!");
+                                    }
+                                    break;
+                                }
+                                else if (speed > 500 && speed < 1000)
+                                {
+                                    DroneY -= 2;
+                                    radar[DroneY, DroneX] = "D";
+                                    if (radar[DroneY - 2, DroneX] == "X" || radar[DroneY - 2, DroneX] == "T")
+                                    {
+                                        if (InRange(altitude))
+                                        {
+                                            Console.WriteLine("Target Lock!");
+                                            radar[DroneY - 2, DroneX] = "-";
+                                            targetLock = true;
+                                        }
+                                        else
+                                        {
+                                            if (radar[DroneY - 2, DroneX] == "X")
+                                            {
+                                                radar[DroneY - 2, DroneX] = "X";
+                                                Console.WriteLine($"Enemy out of range! Enemy altitude - {enemyAltitude}");
+                                            }
+                                            else
+                                            {
+                                                radar[DroneY - 2, DroneX] = "T";
+                                                Console.WriteLine($"Enemy out of range! Enemy altitude - {enemyAltitude}");
+                                            }
+
+                                        }
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("Clear Sky!");
+                                    }
+                                    break;
+                                }
+                                else
+                                {
+                                    DroneY -= 3;
+                                    radar[DroneY, DroneX] = "D";
+                                    if (radar[DroneY - 3, DroneX] == "X" || radar[DroneY - 3, DroneX] == "T")
+                                    {
+                                        if (InRange(altitude))
+                                        {
+                                            Console.WriteLine("Target Lock!");
+                                            radar[DroneY - 3, DroneX] = "-";
+                                            targetLock = true;
+                                        }
+                                        else
+                                        {
+                                            if (radar[DroneY - 3, DroneX] == "X")
+                                            {
+                                                radar[DroneY - 3, DroneX] = "X";
+                                                Console.WriteLine($"Enemy out of range! Enemy altitude - {enemyAltitude}");
+                                            }
+                                            else
+                                            {
+                                                radar[DroneY - 3, DroneX] = "T";
+                                                Console.WriteLine($"Enemy out of range! Enemy altitude - {enemyAltitude}");
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("Clear Sky!");
+                                    }
+                                    break;
+                                }
+                            }
+                            if (r == y && c == x && hasTurnedRight == 2
+                                || hasTurnedLeft == 2
+                                || hasTurnedLeft == 3 && hasTurnedRight == 1)
+                            {
+                                justTurnedRight = false;
+                                didAturn = true;
+                                if (speed < 500)
+                                {
+                                    DroneX += 1;
+                                    radar[DroneY, DroneX] = "D";
+                                    if (radar[DroneY, DroneX + 1] == "X" || radar[DroneY, DroneX + 1] == "T")
+                                    {
+                                        if (InRange(altitude))
+                                        {
+                                            Console.WriteLine("Target Lock!");
+                                            radar[DroneY, DroneX + 1] = "-";
+                                            targetLock = true;
+                                        }
+                                        else
+                                        {
+                                            if (radar[DroneY, DroneX + 1] == "X")
+                                            {
+                                                radar[DroneY, DroneX + 1] = "X";
+                                                Console.WriteLine($"Enemy out of range! Enemy altitude - {enemyAltitude}");
+                                            }
+                                            else
+                                            {
+                                                radar[DroneY, DroneX + 1] = "T";
+                                                Console.WriteLine($"Enemy out of range! Enemy altitude - {enemyAltitude}");
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("Clear Sky!");
+                                    }
+                                    break;
+                                }
+                                else if (speed > 500 && speed < 1000)
+                                {
+                                    DroneX += 2;
+                                    radar[DroneY, DroneX] = "D";
+                                    if (radar[DroneY, DroneX + 2] == "X" || radar[DroneY, DroneX + 2] == "T")
+                                    {
+                                        if (InRange(altitude))
+                                        {
+                                            Console.WriteLine("Target Lock!");
+                                            radar[DroneY, DroneX + 2] = "-";
+                                            targetLock = true;
+                                        }
+                                        else
+                                        {
+                                            if (radar[DroneY, DroneX + 2] == "X")
+                                            {
+                                                radar[DroneY, DroneX + 2] = "X";
+                                                Console.WriteLine($"Enemy out of range! Enemy altitude - {enemyAltitude}");
+                                            }
+                                            else
+                                            {
+                                                radar[DroneY, DroneX + 2] = "T";
+                                                Console.WriteLine($"Enemy out of range! Enemy altitude - {enemyAltitude}");
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("Clear Sky!");
+                                    }
+                                    break;
+                                }
+                                else
+                                {
+                                    DroneX += 3;
+                                    radar[DroneY, DroneX] = "D";
+                                    if (radar[DroneY, DroneX + 3] == "X" || radar[DroneY, DroneX + 3] == "T")
+                                    {
+                                        if (InRange(altitude))
+                                        {
+                                            Console.WriteLine("Target Lock!");
+                                            radar[DroneY, DroneX + 3] = "-";
+                                            targetLock = true;
+                                        }
+                                        else
+                                        {
+                                            if (radar[DroneY, DroneX + 3] == "X")
+                                            {
+                                                radar[DroneY, DroneX + 3] = "X";
+                                                Console.WriteLine($"Enemy out of range! Enemy altitude - {enemyAltitude}");
+                                            }
+                                            else
+                                            {
+                                                radar[DroneY, DroneX + 3] = "T";
+                                                Console.WriteLine($"Enemy out of range! Enemy altitude - {enemyAltitude}");
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("Clear Sky!");
+                                    }
+                                    break;
+                                }
+                            }
+                            else if (r == y && c == x)
+                            {
+                                didAturn = true;
+                                if (speed < 500)
+                                {
+                                    DroneX -= 1;
+                                    radar[DroneY, DroneX] = "D";
+                                    if (radar[DroneY, DroneX - 1] == "X" || radar[DroneY, DroneX - 1] == "T")
+                                    {
+                                        if (InRange(altitude))
+                                        {
+                                            Console.WriteLine("Target Lock!");
+                                            radar[DroneY, DroneX - 1] = "-";
+                                            targetLock = true;
+                                        }
+                                        else
+                                        {
+                                            if (radar[DroneY, DroneX - 1] == "X")
+                                            {
+                                                radar[DroneY, DroneX - 1] = "X";
+                                                Console.WriteLine($"Enemy out of range! Enemy altitude - {enemyAltitude}");
+                                            }
+                                            else
+                                            {
+                                                radar[DroneY, DroneX - 1] = "T";
+                                                Console.WriteLine($"Enemy out of range! Enemy altitude - {enemyAltitude}");
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("Clear Sky!");
+                                    }
+                                    break;
+                                }
+                                else if (speed > 500 && speed < 1000)
+                                {
+                                    DroneX -= 2;
+                                    radar[DroneY, DroneX] = "D";
+                                    if (radar[DroneY, DroneX - 2] == "X" || radar[DroneY, DroneX - 2] == "T")
+                                    {
+                                        if (InRange(altitude))
+                                        {
+                                            Console.WriteLine("Target Lock!");
+                                            radar[DroneY, DroneX - 2] = "-";
+                                            targetLock = true;
+                                        }
+                                        else
+                                        {
+                                            if (radar[DroneY, DroneX - 2] == "X")
+                                            {
+                                                radar[DroneY, DroneX - 2] = "X";
+                                                Console.WriteLine($"Enemy out of range! Enemy altitude - {enemyAltitude}");
+                                            }
+                                            else
+                                            {
+                                                radar[DroneY, DroneX - 2] = "T";
+                                                Console.WriteLine($"Enemy out of range! Enemy altitude - {enemyAltitude}");
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("Clear Sky!");
+                                    }
+                                    break;
+                                }
+                                else
+                                {
+                                    DroneX -= 3;
+                                    radar[DroneY, DroneX] = "D";
+                                    if (radar[DroneY, DroneX - 3] == "X" || radar[DroneY, DroneX - 3] == "T")
+                                    {
+                                        if (InRange(altitude))
+                                        {
+                                            Console.WriteLine("Target Lock!");
+                                            radar[DroneY, DroneX - 3] = "-";
+                                            targetLock = true;
+                                        }
+                                        else
+                                        {
+                                            if (radar[DroneY, DroneX - 3] == "X")
+                                            {
+                                                radar[DroneY, DroneX - 3] = "X";
+                                                Console.WriteLine($"Enemy out of range! Enemy altitude - {enemyAltitude}");
+                                            }
+                                            else
+                                            {
+                                                radar[DroneY, DroneX - 3] = "T";
+                                                Console.WriteLine($"Enemy out of range! Enemy altitude - {enemyAltitude}");
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("Clear Sky!");
+                                    }
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            if (direction == "left") 
+            {
+                justTurnedLeft = true;
+                targetLock = false;
+                for (int r = 0; r < radar.GetLength(0); r++)
+                {
+                    if (didAturn == true)
+                    {
+                        didAturn = false;
+                        break;
+                    }
+                    for (int c = 0; c < radar.GetLength(1); c++)
+                    {
+
+                        if (r == y && c == x && hasTurnedLeft == 0)
+                        {
+                            didAturn = true;
+                            DroneY += 1;
+                            radar[DroneY, DroneX] = "D";
+                            hasTurnedLeft++;
+                            if (radar[DroneY + 1, DroneX] == "X" || radar[DroneY + 1, DroneX] == "T")
+                            {
+                                if (InRange(altitude))
+                                {
+                                    Console.WriteLine("Target Lock!");
+                                    radar[DroneY + 1, DroneX] = "-";
+                                    targetLock = true;
+                                }
+                                else
+                                {
+                                    Console.WriteLine($"Enemy out of range! Enemy altitude - {enemyAltitude}");
+                                }
+                            }
+                            else
+                            {
+                                Console.WriteLine("Clear Sky!");
+                            }
+                            break;
+                        }
+                        else if (r == y && c == x && hasTurnedLeft == 1
+                             || hasTurnedLeft == 0 && hasTurnedRight == 3)
+                        {
+                            didAturn = true;
+                            DroneX += 1;
+                            radar[DroneY, DroneX] = "D";
+                            hasTurnedLeft++;
+                            if (radar[DroneY, DroneX + 1] == "X" || radar[DroneY, DroneX + 1] == "T")
+                            {
+                                if (InRange(altitude))
+                                {
+                                    Console.WriteLine("Target Lock!");
+                                    radar[DroneY, DroneX + 1] = "-";
+                                    targetLock = true;
+                                }
+                                else
+                                {
+                                    Console.WriteLine($"Enemy out of range! Enemy altitude - {enemyAltitude}");
+                                }
+                            }
+                            else
+                            {
+                                Console.WriteLine("Clear Sky!");
+                            }
+                            break;
+                        }
+                        else if (r == y && c == x && hasTurnedLeft == 2
+                           || hasTurnedLeft == 0 && hasTurnedRight == 2
+                           || hasTurnedLeft == 1 && hasTurnedRight == 3
+                           || hasTurnedLeft == 3 && hasTurnedRight == 1)
+                        {
+                            didAturn = true;
+                            DroneY -= 1;
+                            radar[DroneY, DroneX] = "D";
+                            hasTurnedLeft = 2;
+                            hasTurnedRight = 1;
+                            if (radar[DroneY, DroneX] == "X" || radar[DroneY, DroneX] == "T")
+                            {
+                                if (InRange(altitude))
+                                {
+                                    Console.WriteLine("Target Lock!");
+                                    radar[DroneY - 1, DroneX] = "-";
+                                    targetLock = true;
+                                }
+                                else
+                                {
+                                    Console.WriteLine($"Enemy out of range! Enemy altitude - {enemyAltitude}");
+                                }
+                            }
+                            else
+                            {
+                                Console.WriteLine("Clear Sky!");
+                            }
+                            break;
+                        }
+                        else if (r == y && c == x && hasTurnedLeft == 3 && hasTurnedRight == 0
+                           || hasTurnedLeft == 0 && hasTurnedRight == 1
+                           || hasTurnedLeft == 1 && hasTurnedRight == 1
+                           || hasTurnedLeft == 2 && hasTurnedRight == 1)
+                        {
+                            didAturn = true;
+                            DroneX -= 1;
+                            radar[DroneY, DroneX] = "D";
+                            hasTurnedLeft = 0;
+                            hasTurnedRight = 0;
+                            if (radar[DroneY, DroneX] == "X" || radar[DroneY, DroneX] == "T")
+                            {
+                                if (InRange(altitude))
+                                {
+                                    Console.WriteLine("Target Lock!");
+                                    radar[DroneY, DroneX - 1] = "-";
+                                    targetLock = true;
+                                }
+                                else
+                                {
+                                    Console.WriteLine($"Enemy out of range! Enemy altitude - {enemyAltitude}");
+                                }
+                            }
+                            else
+                            {
+                                Console.WriteLine("Clear Sky!");
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+            if (direction == "right")
+            {
+                justTurnedRight = true;
+                targetLock = false;
+                for (int r = 0; r < radar.GetLength(0); r++)
+                {
+                    if (didAturn == true)
+                    {
+                        didAturn = false;
+                        break;
+                    }
+                    for (int c = 0; c < radar.GetLength(1); c++)
+                    {
+                        if (r == y && c == x && hasTurnedRight == 0)
+                        {
+                            didAturn = true;
+                            DroneY -= 1;
+                            radar[DroneY, DroneX] = "D";
+                            hasTurnedRight++;
+                            if (radar[DroneY - 1, DroneX] == "X" || radar[DroneY, DroneX] == "T")
+                            {
+                                if (InRange(altitude))
+                                {
+                                    Console.WriteLine("Target Lock!");
+                                    radar[DroneY - 1, DroneX] = "-";
+                                    targetLock = true;
+                                }
+                                else
+                                {
+                                    Console.WriteLine($"Enemy out of range! Enemy altitude - {enemyAltitude}");
+                                }
+                            }
+                            else
+                            {
+                                Console.WriteLine("Clear Sky!");
+                            }
+                            break;
+                        }
+                        if (r == y && c == x && hasTurnedRight == 1
+                            || hasTurnedRight == 1 && hasTurnedLeft == 2
+                            || hasTurnedRight == 0 && hasTurnedLeft == 3)
+                        {
+                            didAturn = true;
+                            DroneX += 1;
+                            radar[DroneY, DroneX] = "D";
+                            hasTurnedRight++;
+                            if (radar[DroneY, DroneX + 1] == "X" || radar[DroneY, DroneX] == "T")
+                            {
+                                if (InRange(altitude))
+                                {
+                                    Console.WriteLine("Target Lock!");
+                                    radar[DroneY, DroneX + 1] = "-";
+                                    targetLock = true;
+                                }
+                                else
+                                {
+                                    Console.WriteLine($"Enemy out of range! Enemy altitude - {enemyAltitude}");
+                                }
+                            }
+                            else
+                            {
+                                Console.WriteLine("Clear Sky!");
+                            }
+                            break;
+                        }
+                        if (r == y && c == x && hasTurnedRight == 2
+                            || hasTurnedRight == 0 && hasTurnedLeft == 2)
+                        {
+                            didAturn = true;
+                            DroneY += 1;
+                            radar[DroneY, DroneX] = "D";
+                            hasTurnedRight++;
+                            hasTurnedLeft = 1;
+                            if (radar[DroneY + 1, DroneX] == "X" || radar[DroneY, DroneX] == "T")
+                            {
+                                if (InRange(altitude))
+                                {
+                                    Console.WriteLine("Target Lock!");
+                                    radar[DroneY + 1, DroneX] = "-";
+                                    targetLock = true;
+                                }
+                                else
+                                {
+                                    Console.WriteLine($"Enemy out of range! Enemy altitude - {enemyAltitude}");
+                                }
+                            }
+                            else
+                            {
+                                Console.WriteLine("Clear Sky!");
+                            }
+
+                            break;
+                        }
+                        if (r == y && c == x && hasTurnedRight == 3
+                            || hasTurnedRight == 0 && hasTurnedLeft == 1
+                            || hasTurnedRight == 3 && hasTurnedLeft == 1
+                            || hasTurnedRight == 1 && hasTurnedLeft == 1
+                            || hasTurnedRight == 2 && hasTurnedLeft == 1)
+                        {
+                            didAturn = true;
+                            DroneX -= 1;
+                            radar[DroneY, DroneX] = "D";
+                            hasTurnedRight = 0;
+                            hasTurnedLeft = 0;
+                            if (radar[DroneY, DroneX - 1] == "X" || radar[DroneY - 1, DroneX] == "T")
+                            {
+                                if (InRange(altitude))
+                                {
+                                    Console.WriteLine("Target Lock!");
+                                    radar[DroneY, DroneX - 1] = "-";
+                                    targetLock = true;
+                                }
+                                else
+                                {
+                                    Console.WriteLine($"Enemy out of range! Enemy altitude - {enemyAltitude}");
+                                }
+                            }
+                            else
+                            {
+                                Console.WriteLine("Clear Sky!");
+                            }
+                            break;
+                        }
+                    }
+                }
+            } 
+        } 
+    } 
+}
