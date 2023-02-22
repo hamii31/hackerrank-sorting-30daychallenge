@@ -7,7 +7,6 @@ namespace MusicTinderApp.Core
 {
     internal class Engine
     {
-        // TODO: Delete profile
         private static List<string> Emails = new List<string>();
         private static StringBuilder chatlog = new StringBuilder();
         private static Dictionary<string, List<string>> UserInfo = new Dictionary<string, List<string>>(); // username + list of genres they like
