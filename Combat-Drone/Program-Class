@@ -1,0 +1,513 @@
+
+using System.Text;
+
+namespace Drone
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            var sb = new StringBuilder();
+
+            DroneControlBuilder(sb);
+
+            Drone drone = new Drone();
+
+            var currentSpeed = 0;
+            var currentAltitude = 0;
+
+            bool hasLanded = true;
+            bool hasTurnedLeft = false;
+            bool hasTurnedRight = false;
+
+            Random rnd = new Random();
+            var m1 = 20;
+            var m2 = 20;
+            var A1 = rnd.Next(3, 17);
+            var A2 = rnd.Next(3, 17);
+            var X1 = rnd.Next(2, 18);
+            var X2 = rnd.Next(2, 18);
+            Console.WriteLine();
+            Console.WriteLine("A is base, X is target, T is enemy aircraft. Neutralise e.");
+            Radar radar = new Radar(m1, m2, A1, A2, X1, X2);
+            var droneX = radar.BaseX - 1;
+            var droneY = radar.BaseY;
+
+            while (true)
+            {
+                if (hasLanded == false && hasTurnedLeft == false && hasTurnedRight == false)
+                {
+                    radar.CurrentLocationOnRadar(radar.RadarHolder, droneX, droneY, "forward", currentSpeed, currentAltitude);
+                    drone.FuelExpediture(currentSpeed);
+
+                }
+                if (hasLanded == false && hasTurnedLeft == true && hasTurnedRight == false)
+                {
+                    radar.CurrentLocationOnRadar(radar.RadarHolder, droneX, droneY, "left", currentSpeed, currentAltitude);
+                    drone.FuelExpediture(currentSpeed);
+                    hasTurnedLeft = false;
+                }
+                if (hasLanded == false && hasTurnedLeft == false && hasTurnedRight == true)
+                {
+                    radar.CurrentLocationOnRadar(radar.RadarHolder, droneX, droneY, "right", currentSpeed, currentAltitude);
+                    drone.FuelExpediture(currentSpeed);
+                    hasTurnedRight = false;
+                }
+
+                Report(currentSpeed, currentAltitude, drone.Fuel, drone.RocketCount);
+                radar.ShowRadar(radar.RadarHolder);
+
+                if (radar.targetLock == true)
+                {
+                    drone.FireRocket(radar.enemyAltitude);
+                }
+
+                if (drone.targetsDestroyed == 3)
+                {
+                    Console.WriteLine("Enemy threats neutralized!" +
+                        $"Returning {drone.Name} to the Airfield!");
+                    break;
+                }
+                if (drone.Fuel < 100)
+                {
+                    Console.WriteLine($"{drone.Name}'s fuel has ran out! Mission failure!");
+                    break;
+                }
+                if (radar.SignalLost)
+                {
+                    Console.WriteLine($"Connection to {drone.Name} lost! Mission failure!");
+                    break;
+                }
+
+                Console.Write("Awaiting commands: ");
+                string command = Console.ReadLine();
+                switch (command)
+                {
+                    case "W":
+                        if (!drone.tookOff)
+                        {
+                            (int, int) values;
+                            while (true)
+                            {
+                                Console.WriteLine("Recommended speed for take off - 200km/h");
+                                Console.Write("Awaiting speed for take off:");
+                                var speed = int.Parse(Console.ReadLine());
+                                values = drone.TakeOff(speed);
+                                if (drone.tookOff)
+                                {
+                                    Console.WriteLine($"{drone.Name} is in the air!");
+                                    hasLanded = false;
+                                    drone.TakeOffFlapsControl();
+                                    Console.WriteLine("Gain altitude!");
+                                    drone.FuelExpediture(currentSpeed);
+                                    break;
+                                }
+                                else
+                                {
+                                    hasLanded = true;
+                                    break;
+                                }
+                            }
+                            currentSpeed = values.Item1;
+                            currentAltitude = values.Item2;
+                        }
+                        else
+                        {
+                            Console.Write("Speed: ");
+                            var speed = int.Parse(Console.ReadLine());
+                            currentSpeed = drone.ThrottleUp(speed);
+                        }
+                        break;
+                    case "S":
+                        if (currentAltitude <= 15 && currentSpeed <= 150)
+                        {
+                            hasLanded = drone.Landing(currentSpeed, currentAltitude);
+                            Console.WriteLine("Touchdown!");
+                            Console.WriteLine("Bringing Speed Down!");
+                            currentSpeed = 0;
+                            currentAltitude = 0;
+                            Console.WriteLine($"{drone.Name} has successfully landed!");
+                            drone.FuelExpediture(currentSpeed);
+                            drone.tookOff = false;
+                        }
+                        else
+                        {
+                            Console.Write("Speed: ");
+                            var speed = int.Parse(Console.ReadLine());
+                            currentSpeed = drone.ThrottleDown(speed);
+                        }
+                        break;
+                    case "D up":
+                        if (hasLanded == true)
+                        {
+                            Console.WriteLine($"{drone.Name} is on the ground! Take off in order to conduct turns!");
+                        }
+                        else
+                        {
+                            drone.RightAileronControl("right");
+                            Console.WriteLine("To successfully turn to the right, lower the left wing aileron " +
+                            "after which bring the horizontal stabilizer down!");
+                            Console.Write("Awaiting order: ");
+                            var inputDup = Console.ReadLine();
+                            if (inputDup == "A down")
+                            {
+                                drone.LeftAileronControl("right");
+                                Console.WriteLine("Bring the horizontal stabilizer down!");
+                                Console.Write("Awaiting order: ");
+                                inputDup = Console.ReadLine();
+                                if (inputDup == "Z")
+                                {
+                                    drone.BringHStabilizerDown();
+                                    drone.BringHStabilizerDown();
+                                    Console.WriteLine($"{drone.Name} is turning to the right!"); // show on radar
+                                    if (drone.RightAileronUp == false && drone.LeftAileronDown == false)
+                                    {
+                                        Console.WriteLine("Both ailerons are in neutral position!");
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("There is a problem with the ailerons!");
+                                    }
+                                    hasTurnedRight = true;
+                                }
+                                else
+                                {
+                                    Console.WriteLine($"{drone.Name} returning to normal trajectory.");
+                                }
+                            }
+                            else
+                            {
+                                Console.WriteLine($"{drone.Name} returning to normal trajectory.");
+                            }
+                        }
+
+                        break;
+                    case "D down":
+                        if (hasLanded == true)
+                        {
+                            Console.WriteLine($"{drone.Name} is on the ground! Take off in order to conduct turns!");
+                        }
+                        else
+                        {
+                            drone.RightAileronControl("left");
+                            Console.WriteLine("To successfully turn to the left, bring the left wing aileron up " +
+                            "after which bring the horizontal stabilizer down!");
+                            Console.Write("Awaiting order: ");
+                            var inputDdown = Console.ReadLine();
+                            if (inputDdown == "A up")
+                            {
+                                drone.LeftAileronControl("left");
+                                Console.WriteLine("Bring the horizontal stabilizer down!");
+                                Console.Write("Awaiting order: ");
+                                inputDdown = Console.ReadLine();
+                                if (inputDdown == "Z")
+                                {
+                                    drone.BringHStabilizerDown();
+                                    drone.BringHStabilizerDown();
+                                    Console.WriteLine($"{drone.Name} is turning to the left!"); // show on radar
+                                    if (drone.RightAileronDown == false && drone.LeftAileronUp == false)
+                                    {
+                                        Console.WriteLine("Both ailerons are in neutral position!");
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("There is a problem with the ailerons!");
+                                    }
+                                    hasTurnedLeft = true;
+                                }
+                                else
+                                {
+                                    Console.WriteLine($"{drone.Name} returning to normal trajectory.");
+                                }
+                            }
+                            else
+                            {
+                                Console.WriteLine($"{drone.Name} returning to normal trajectory.");
+                            }
+                        }
+                        break;
+                    case "A up":
+                        if (hasLanded == true)
+                        {
+                            Console.WriteLine($"{drone.Name} is on the ground! Take off in order to conduct turns!");
+                        }
+                        else
+                        {
+                            drone.LeftAileronControl("left");
+                            Console.WriteLine("To successfully turn to the left, bring the right wing aileron down " +
+                            "after which bring the horizontal stabilizer down!");
+                            Console.Write("Awaiting order: ");
+                            var inputAup = Console.ReadLine();
+                            if (inputAup == "D down")
+                            {
+                                drone.RightAileronControl("left");
+                                Console.WriteLine("Bring the horizontal stabilizer down!");
+                                Console.Write("Awaiting order: ");
+                                inputAup = Console.ReadLine();
+                                if (inputAup == "Z")
+                                {
+                                    drone.BringHStabilizerDown();
+                                    drone.BringHStabilizerDown();
+                                    Console.WriteLine($"{drone.Name} is turning to the left!"); // show on radar
+                                    if (drone.RightAileronDown == false && drone.LeftAileronUp == false)
+                                    {
+                                        Console.WriteLine("Both ailerons are in neutral position!");
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("There is a problem with the ailerons!");
+                                    }
+                                    hasTurnedLeft = true;
+                                }
+                                else
+                                {
+                                    Console.WriteLine($"{drone.Name} returning to normal trajectory.");
+                                }
+                            }
+                            else
+                            {
+                                Console.WriteLine($"{drone.Name} returning to normal trajectory.");
+                            }
+                        }
+                        break;
+                    case "A down":
+                        if (hasLanded == true)
+                        {
+                            Console.WriteLine($"{drone.Name} is on the ground! Take off in order to conduct turns!");
+                        }
+                        else
+                        {
+                            drone.LeftAileronControl("right");
+                            Console.WriteLine("To successfully turn to the right, bring the right wing aileron up " +
+                           "after which bring the horizontal stabilizer down!");
+                            Console.Write("Awaiting order: ");
+                            var inputAdown = Console.ReadLine();
+                            if (inputAdown == "D up")
+                            {
+                                drone.RightAileronControl("right");
+                                Console.WriteLine("Bring the horizontal stabilizer down!");
+                                Console.Write("Awaiting order: ");
+                                inputAdown = Console.ReadLine();
+                                if (inputAdown == "Z")
+                                {
+                                    drone.BringHStabilizerDown();
+                                    drone.BringHStabilizerDown();
+                                    Console.WriteLine($"{drone.Name} is turning to the right!"); // show on radar
+                                    if (drone.RightAileronUp == false && drone.LeftAileronDown == false)
+                                    {
+                                        Console.WriteLine("Both ailerons are in neutral position!");
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("There is a problem with the ailerons!");
+                                    }
+                                    hasTurnedRight = true;
+                                }
+                                else
+                                {
+                                    Console.WriteLine($"{drone.Name} returning to normal trajectory.");
+                                }
+                            }
+                            else
+                            {
+                                Console.WriteLine($"{drone.Name} returning to normal trajectory.");
+                            }
+                        }
+                        break;
+                    case "E":
+                        if (hasLanded == true)
+                        {
+                            Console.WriteLine($"{drone.Name} is on the ground! Take off in order to conduct turns!");
+                        }
+                        else
+                        {
+                            Console.WriteLine("To successfully turn to the right, bring the left wing aileron down, " +
+                           "the right wing aileron up and the horizontal stabilizer down!");
+                            Console.Write("Awaiting order: ");
+                            var inputE = Console.ReadLine();
+                            if (inputE == "A down")
+                            {
+                                Console.WriteLine("Bring the right wing aileron up and the horizontal stabilizer down!");
+                                Console.Write("Awaiting order: ");
+                                inputE = Console.ReadLine();
+                                if (inputE == "D up")
+                                {
+                                    Console.WriteLine("Bring the horizontal stabilizer down!");
+                                    Console.Write("Awaiting order: ");
+                                    inputE = Console.ReadLine();
+                                    if (inputE == "Z")
+                                    {
+                                        Console.WriteLine($"{drone.Name} is turning to the right!"); // show on radar
+                                        hasTurnedRight = true;
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine($"{drone.Name} returning to normal trajectory.");
+                                    }
+                                }
+                                else
+                                {
+                                    Console.WriteLine($"{drone.Name} returning to normal trajectory.");
+                                }
+                            }
+                            if (inputE == "D up")
+                            {
+                                Console.WriteLine("Bring the left wing aileron down and the horizontal stabilizer down!");
+                                Console.Write("Awaiting order: ");
+                                inputE = Console.ReadLine();
+                                if (inputE == "A down")
+                                {
+                                    Console.WriteLine("Bring the horizontal stabilizer down!");
+                                    Console.Write("Awaiting order: ");
+                                    inputE = Console.ReadLine();
+                                    if (inputE == "Z")
+                                    {
+                                        Console.WriteLine($"{drone.Name} is turning to the right!"); // show on radar
+                                        hasTurnedRight = true;
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine($"{drone.Name} returning to normal trajectory.");
+                                    }
+                                }
+                                else
+                                {
+                                    Console.WriteLine($"{drone.Name} returning to normal trajectory.");
+                                }
+                            }
+                            else
+                            {
+                                Console.WriteLine($"{drone.Name} returning to normal trajectory.");
+                            }
+                        }
+                        break;
+                    case "Q":
+                        if (hasLanded == true)
+                        {
+                            Console.WriteLine($"{drone.Name} is on the ground! Take off in order to conduct turns!");
+                        }
+                        else
+                        {
+                            Console.WriteLine("To successfully turn to the left, bring the left wing aileron up, " +
+                           "the right wing aileron down and the horizontal stabilizer down!");
+                            Console.Write("Awaiting order: ");
+                            var inputQ = Console.ReadLine();
+                            if (inputQ == "A up")
+                            {
+                                Console.WriteLine("Bring the right wing aileron up and the horizontal stabilizer down!");
+                                Console.Write("Awaiting order: ");
+                                inputQ = Console.ReadLine();
+                                if (inputQ == "D down")
+                                {
+                                    Console.WriteLine("Bring the horizontal stabilizer down!");
+                                    Console.Write("Awaiting order: ");
+                                    inputQ = Console.ReadLine();
+                                    if (inputQ == "Z")
+                                    {
+                                        Console.WriteLine($"{drone.Name} is turning to the left!"); // show on radar
+                                        hasTurnedLeft = true;
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine($"{drone.Name} returning to normal trajectory.");
+                                    }
+                                }
+                                else
+                                {
+                                    Console.WriteLine($"{drone.Name} returning to normal trajectory.");
+                                }
+                            }
+                            if (inputQ == "D down")
+                            {
+                                Console.WriteLine("Bring the left wing aileron up and the horizontal stabilizer down!");
+                                Console.Write("Awaiting order: ");
+                                inputQ = Console.ReadLine();
+                                if (inputQ == "A up")
+                                {
+                                    Console.WriteLine("Bring the horizontal stabilizer down!");
+                                    Console.Write("Awaiting order: ");
+                                    inputQ = Console.ReadLine();
+                                    if (inputQ == "Z")
+                                    {
+                                        Console.WriteLine($"{drone.Name} is turning to the left!"); // show on radar
+                                        hasTurnedLeft = true;
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine($"{drone.Name} returning to normal trajectory.");
+                                    }
+                                }
+                                else
+                                {
+                                    Console.WriteLine($"{drone.Name} returning to normal trajectory.");
+                                }
+                            }
+                            else
+                            {
+                                Console.WriteLine($"{drone.Name} returning to normal trajectory.");
+                            }
+                        }
+                        break;
+                    case "X":
+                        Console.Write("Enter the desired altitude: ");
+                        var input = int.Parse(Console.ReadLine());
+                        var valuesX = drone.IncreaseHeight(currentSpeed, input);
+                        currentSpeed = valuesX.Item1;
+                        currentAltitude = valuesX.Item2;
+                        break;
+                    case "Z":
+                        Console.Write("Enter the desired altitude: ");
+                        var inputZ = int.Parse(Console.ReadLine());
+                        var valuesZ = drone.DecreaseHeight(currentSpeed, inputZ);
+                        currentSpeed = valuesZ.Item1;
+                        currentAltitude = valuesZ.Item2;
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
+        public static void DroneControlBuilder(StringBuilder sb)
+        {
+            sb.AppendLine("Drone Commands:");
+            sb.AppendLine("=> Engine Basic Control:");
+            sb.AppendLine("--- W - throttle up"); // if speed is below 500, move with one square, if speed is below 1000, but below 500 -> 2 squares, above 1000 -> 3 squares
+            sb.AppendLine("--- S - throttle down");
+            sb.AppendLine("=> Flap control:");
+            sb.AppendLine("--- D + Up - right wing aileron control: up"); 
+            sb.AppendLine("--- D + Down - right wing aileron control: down");
+            sb.AppendLine("--- A + Up - left wing aileron control: up");
+            sb.AppendLine("--- A + Down - left wing aileron control: down");
+            sb.AppendLine("=> Tail Section Control:");
+            sb.AppendLine("--- E - vertical stabilizer to the right"); 
+            sb.AppendLine("--- Q - vertical stabilizer to the left");
+            sb.AppendLine("--- Z - horizontal stabilizers control: down");
+            sb.AppendLine("--- X - horizontal stabiliziers control: up");
+            sb.AppendLine("=> Weaponry Control:");
+            sb.AppendLine("--- R - Launch Rocket"); 
+
+            sb.AppendLine("Enviromental Controls:");
+            sb.AppendLine("=> Spawn enemy on radar - P");
+            sb.AppendLine("=> Spawn enviromental hazard - H");
+
+            Console.WriteLine(sb.ToString().Trim());
+
+            sb.Clear();
+        }
+        public static void Report(int currentSpeed, int currentAltitude, int fuel, int rocketCount)
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine("");
+            sb.AppendLine("======================================");
+            sb.AppendLine($"Current speed - {currentSpeed} km/h");
+            sb.AppendLine($"Current altitude - {currentAltitude} m");
+            sb.AppendLine($"Fuel left - {fuel} L");
+            sb.AppendLine($"Rockets Available - {rocketCount}");
+            sb.AppendLine("======================================");
+            sb.AppendLine("");
+            Console.WriteLine(sb.ToString().Trim());
+            sb.Clear();
+        }
+    }
+}
