@@ -1,0 +1,440 @@
+
+
+namespace Drone
+{
+    public class Drone
+    {
+        private const int MaxSpeed = 2000; // km/h
+        private const int StallSpeed = 100; // km/h
+        private const int SpeedForTakeOff = 200; // km/h
+        private const int SpeedForLanding = 150; // km/h
+
+        private const int LowestAtitudeAllowed = 10; //m
+        private const int AltitudeForLanding = 15; //m
+
+        public int Fuel = 5000; // liters
+
+        public bool HitTheGround = false;
+
+        public bool IsCurrentlyGainingAltitude = false;
+
+        private int warnings = 0;
+
+        public string Name = "Xorc15t";
+        public int Altitude = 0;
+        public int Speed = 0;
+
+        public bool tookOff = false;
+        public bool succesfulLanding = false;
+
+        public bool gearUp = false;
+
+        public bool landingFlaps = false;
+        public bool takeOffFlaps = false;
+        public bool combatFlaps = false;
+
+        public bool horizontalStabilizerUp = false;
+        public bool horizontalStabilizerDown = false;
+
+        public bool RightAileronUp = false;
+        public bool RightAileronDown = false;
+
+        public bool LeftAileronUp = false;
+        public bool LeftAileronDown = false;
+
+        public int RocketCount = 6;
+
+        public int targetsDestroyed = 0;
+        public (int, int) TakeOff(int speed)
+        {
+            if (Speed + speed < SpeedForTakeOff && warnings < 3)
+            {
+                this.Speed += speed;
+                Console.WriteLine("Increase speed in order to take off!");
+                warnings++;
+                return (this.Speed, Altitude);
+            }
+            else if (this.Speed < SpeedForTakeOff && warnings == 3)
+            {
+                Console.WriteLine($"{Name} has aborted the takeoff due to too many warnings!");
+                this.Speed = 0;
+                warnings = 0;
+                tookOff = false;
+                return (this.Speed, Altitude);
+            }
+            else
+            {
+                warnings = 0;
+                this.Speed += speed;
+                tookOff = true;
+                Altitude = 15;
+                if (takeOffFlaps == false)
+                {
+                    Console.WriteLine(">Deploying takeoff flaps!<");
+                    TakeOffFlapsControl();
+                }
+                if (horizontalStabilizerDown == false)
+                {
+                    BringHStabilizerDown();
+                    BringHStabilizerDown();
+                }
+                if (gearUp == false)
+                {
+                    Console.WriteLine(">Putting the gear up!<");
+                    GearControl();
+                }
+                Console.WriteLine("Drone is taking off... Awaiting orders.");
+            }
+            return (this.Speed, Altitude);
+
+        }
+        public bool Landing(int speed, int altitude)
+        {
+            if (altitude > AltitudeForLanding)
+            {
+                Console.WriteLine($"Bring {Name} to a lower altitude before attempting landing!");
+                return false;
+            }
+            else if (speed > SpeedForLanding)
+            {
+                Console.WriteLine($"Lower the speed so you can initiate the landing!");
+                return false;
+            }
+            else
+            {
+                if (gearUp == true)
+                {
+                    Console.WriteLine(">Landing gear is being deployed!<");
+                    GearControl();
+                }
+                if (landingFlaps == false)
+                {
+                    Console.WriteLine(">Lowering landing flaps!<");
+                    LandingFlapsControl();
+                }
+                Console.WriteLine("Everything looks normal. Landing...");
+                succesfulLanding = true;;
+                return succesfulLanding;
+            }
+        }
+        public bool TakeOffFlapsControl()
+        {
+            if (takeOffFlaps == true)
+            {
+                Console.WriteLine(">Takeoff flaps in!<");
+                takeOffFlaps = false;
+                return takeOffFlaps;
+            }
+            else
+            {
+                Console.WriteLine(">Takeoff flaps out!<");
+                takeOffFlaps = true;
+                return takeOffFlaps;
+            }
+        }
+        public bool LandingFlapsControl()
+        {
+            if (landingFlaps == false)
+            {
+                Console.WriteLine(">Landing flaps out!<");
+                landingFlaps = true;
+                return landingFlaps;
+            }
+            else
+            {
+                Console.WriteLine(">Landing flaps in!<");
+                landingFlaps = false;
+                return landingFlaps;
+            }
+        }
+        public bool GearControl()
+        {
+            if (gearUp == true)
+            {
+                Console.WriteLine(">Landing gear down!<");
+                gearUp = false;
+                return gearUp;
+            }
+            else
+            {
+                Console.WriteLine(">Landing gear up!<");
+                gearUp = true;
+                return gearUp;
+            }
+        }
+        public int ThrottleUp(int speed)
+        {
+            if (this.Speed + speed > MaxSpeed - speed && warnings == 0)
+            {
+                Console.WriteLine($"Moving at speeds that exceed the maximal speed of {Name}!");
+                this.Speed += speed;
+                Console.WriteLine("Warning! Slow down!");
+                warnings++;
+                Console.WriteLine(warnings);
+                return Speed;
+            }
+            else if (this.Speed + speed > MaxSpeed && warnings > 0)
+            {
+                Console.WriteLine($"Maximum speed reached! Automatically bringing {Name} down to normal speeds!");
+                Speed -= 1000;
+                return Speed + StallSpeed;
+            }
+            else
+            {
+                this.Speed += speed;
+                Console.WriteLine($">Speed increased to {Speed}km/h<");
+                return this.Speed;
+            }
+        }
+        public int ThrottleDown(int speed) 
+        { 
+            if (this.Speed - speed < StallSpeed) 
+            {
+                if (warnings >= 1 && IsCurrentlyGainingAltitude == true)
+                {
+                    warnings = 0;
+                    Console.WriteLine(">Leveling out aircraft!<");
+                    BringHStabilizerUp();
+                    BringHStabilizerUp();
+                    for (int i = 0; i < 2; i++)
+                    {
+                        ThrottleUp(150);
+                    }
+                    BringHStabilizerDown();
+                    BringHStabilizerDown();
+                    return this.Speed;
+                }
+                if (warnings >= 1 && Altitude >= 200)
+                {
+                    Console.WriteLine(">Automatically gaining speed!<");
+                    BringHStabilizerDown();
+                    ThrottleUp(100);
+                    BringHStabilizerDown();
+                    DecreaseHeight(Speed, Altitude);
+                    return this.Speed;
+                }
+                else
+                {
+                    Console.WriteLine($"Throttle down or {Name} will go in a stall!");
+                    warnings++;
+                    Speed -= speed;
+                    return this.Speed;
+                }
+                
+            }
+            if (speed > Speed)
+            {
+                Console.WriteLine("Can't decrease to that speed!");
+                return this.Speed;
+            }
+            else
+            {
+                Speed -= speed;
+                Console.WriteLine($">Speed decreased to {Speed}km/h<");
+                return this.Speed;
+            }
+        }
+        public (int, int) IncreaseHeight(int speed, int altitude)
+        {
+            IsCurrentlyGainingAltitude = true;
+            BringHStabilizerDown();
+            var lostSpeed = 0;
+            BringHStabilizerDown();
+            while (true)
+            {
+                lostSpeed += 5;
+                if (Altitude >= altitude)
+                {
+                    Console.WriteLine($">Desired altitude reached! Bringing {Name} to it's original trajectory!<");
+                    BringHStabilizerUp();
+                    BringHStabilizerUp();
+                    if (altitude < 500)
+                    {
+                        ThrottleUp(25);
+                    }
+                    if (altitude > 500)
+                    {
+                        ThrottleUp(100);
+                    }
+                    IsCurrentlyGainingAltitude = false;
+                    break;
+                }
+               
+                else
+                {
+                    Altitude += 50;
+                    Console.WriteLine($">>> Current altitude:{Altitude}m <<<");
+                    ThrottleDown(lostSpeed);
+                    FuelExpediture(lostSpeed);
+                    if (speed <= StallSpeed)
+                    {
+                        DecreaseHeight(speed, 200);
+                        lostSpeed = 0;
+                    }
+                }
+            }
+            return (Speed, Altitude);
+        }
+        public (int, int) DecreaseHeight(int speed, int altitude)
+        {
+            Console.WriteLine(">Turning off engines for fuel preservation!<");
+            BringHStabilizerUp();
+            BringHStabilizerUp();
+            var gainedSpeed = 0;
+            if (Altitude - altitude < 0)
+            {
+                HitTheGround = true;
+            }
+            while (true)
+            {
+                gainedSpeed += 5;
+                if (Altitude - 50 <= altitude)
+                {
+                    Console.WriteLine(">Turning the engines on!<");
+                }
+                if (Altitude <= altitude)
+                {
+                    Console.WriteLine($">Desired altitude reached! Bringing {Name} to it's original trajectory!<");
+                    BringHStabilizerDown();
+                    BringHStabilizerDown();
+                    ThrottleDown(100);
+                    break;
+                }
+                else
+                {
+                    Altitude -= 50;
+                    Console.WriteLine($">>> Current altitude:{Altitude}m <<<");
+                    ThrottleUp(gainedSpeed);
+                     
+                }
+            }
+            return (Speed, Altitude);
+        }
+        public bool BringHStabilizerDown()
+        {
+            if (horizontalStabilizerDown == false)
+            {
+                if (horizontalStabilizerUp == true)
+                {
+                    Console.WriteLine(">Bringing horizontal stabilizer to neutral!<");
+                    horizontalStabilizerUp = false;
+                    Console.WriteLine(">Bringing horizontal stabilizer down!<");
+                    horizontalStabilizerDown = true;
+                    return horizontalStabilizerDown;
+                }
+                else
+                {
+                    Console.WriteLine(">Bringing horizontal stabilizer down!<");
+                    horizontalStabilizerDown = true;
+                    return horizontalStabilizerDown;
+                }
+            }
+            else
+            {
+                Console.WriteLine(">Bringing horizontal stabilizer to neutral!<");
+                horizontalStabilizerDown = false;
+                return horizontalStabilizerDown;
+            }
+        }
+        public bool BringHStabilizerUp()
+        {
+            if (horizontalStabilizerUp == false)
+            {
+                if (horizontalStabilizerDown == true)
+                {
+                    Console.WriteLine(">Bringing horizontal stabilizer to neutral!<");
+                    horizontalStabilizerDown = false;
+                    Console.WriteLine(">Bringing horizontal stabilizer up!<");
+                    horizontalStabilizerUp = true;
+                    return horizontalStabilizerUp;
+                }
+                else
+                {
+                    Console.WriteLine(">Bringing horizontal stabilizer up!<");
+                    horizontalStabilizerUp = true;
+                    return horizontalStabilizerUp;
+                }
+            }
+            else
+            {
+                Console.WriteLine(">Bringing horizontal stabilizer to neutral!<");
+                horizontalStabilizerUp = false;
+                return horizontalStabilizerUp;
+            }
+        }
+        public int FuelExpediture(int speed)
+        {
+            Fuel -= speed / 5;
+            return Fuel;
+        }
+        public void RightAileronControl(string command)
+        {
+            if (command == "left")
+            {
+                if (RightAileronDown == false)
+                {
+                    Console.WriteLine(">Right aileron is brought down!<");
+                    RightAileronDown = true;
+                }
+                RightAileronDown = false;
+            }
+            if (command == "right")
+            {
+                if (RightAileronUp == false)
+                {
+                    Console.WriteLine(">Right aileron is brought up!<");
+                    RightAileronUp = true;
+                }
+                RightAileronUp = false;
+            }
+        }
+        public void LeftAileronControl(string command)
+        {
+            if (command == "left")
+            {
+                if (LeftAileronUp == false)
+                {
+                    Console.WriteLine(">Left aileron is brought up!<");
+                    LeftAileronUp = true;
+                }
+                LeftAileronUp = false;
+            }
+            if (command == "right")
+            {
+                if (LeftAileronDown == false)
+                {
+                    Console.WriteLine(">Left aileron is brought down!<");
+                    LeftAileronDown = true;
+                }
+                LeftAileronDown = false;
+            }
+        }
+        public void FireRocket(int enemyAlt)
+        {
+            if (Altitude - enemyAlt <= 1000)
+            {
+                Console.WriteLine("Rocket calculating trajectory!");
+                Console.WriteLine("Trajectory calculated!");
+                Console.WriteLine("Firing Rocket...");
+                Console.WriteLine("Rocket is tracking target!");
+
+                RocketCount -= 1;
+
+                Console.WriteLine("Target destroyed!");
+
+                targetsDestroyed++;
+            }
+            else
+            {
+                if (Altitude < enemyAlt)
+                {
+                    Console.WriteLine($"Target is at {enemyAlt} and {Name} is at {Altitude}. Gain altitude!");
+                }
+                else
+                {
+                    Console.WriteLine($"Target is at {enemyAlt} and {Name} is at {Altitude}. Lose altitude!");
+                }
+            }
+        }
+    }
+}
