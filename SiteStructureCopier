@@ -1,0 +1,27 @@
+using System.Net;
+using System.Text;
+
+namespace SiteStructureCopier
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            var outputFile = @"..\..\..\IO\output.txt";
+
+            using (WebClient client = new WebClient())
+            {
+                string s = client.DownloadString("Place URL of site");
+
+                StringBuilder sb = new StringBuilder();
+                sb.Append(s);
+                Console.WriteLine(sb);
+                using (var writer = new StreamWriter(outputFile))
+                {
+                    writer.Write(sb.ToString());
+                }
+            }
+        }
+        
+    }
+}
