@@ -14,6 +14,7 @@ namespace IPod
             while (true)
             {
                 Console.WriteLine("Save, Listen or Delete");
+                Console.WriteLine("Type exit to close the application");
                 var input = Console.ReadLine().ToLower();
                 if (input == "save")
                 {
@@ -24,19 +25,22 @@ namespace IPod
                     if (URLs.Count != null)
                     {
                         OpenUrl(URLs);
-                        TransferLinks(URLs, ouptufile);
                     }
                     else
                     {
                         Console.WriteLine("No songs to listen to!");
                     }
                 }
-                else
+                else if (input == "delete")
                 {
                     DeleteURLs(URLs);
                 }
+                else
+                {
+                    break;
+                }
             }
-            
+            TransferLinks(URLs, ouptufile);
         }
         static void DeleteURLs(Dictionary<string, string> urls)
         {
@@ -45,8 +49,6 @@ namespace IPod
             if (urls.ContainsKey(input))
             {
                 urls.Remove(input);
-                Console.WriteLine("Song removed!");
-                Console.WriteLine(string.Join(", ", urls.Keys));
             }
             else
             {
