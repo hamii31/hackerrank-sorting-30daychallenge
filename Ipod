@@ -1,0 +1,130 @@
+
+using System.Diagnostics;
+using System.Runtime.InteropServices;
+
+namespace IPod
+{
+    public class Program
+    {
+        public static Dictionary<string, string> URLs = new Dictionary<string, string>();
+        public static int URLCount = 0;
+        static void Main(string[] args)
+        {
+            var ouptufile = @"..\..\..\Links\links.txt";
+            while (true)
+            {
+                Console.WriteLine("Save, Listen or Delete");
+                var input = Console.ReadLine().ToLower();
+                if (input == "save")
+                {
+                    SaveURL(URLs);
+                }
+                else if (input == "listen")
+                {
+                    if (URLs.Count != null)
+                    {
+                        OpenUrl(URLs);
+                        TransferLinks(URLs, ouptufile);
+                    }
+                    else
+                    {
+                        Console.WriteLine("No songs to listen to!");
+                    }
+                }
+                else
+                {
+                    DeleteURLs(URLs);
+                }
+            }
+            
+        }
+        static void DeleteURLs(Dictionary<string, string> urls)
+        {
+            Console.WriteLine("Which song do you want to delete? Type the number");
+            var input = Console.ReadLine();
+            if (urls.ContainsKey(input))
+            {
+                urls.Remove(input);
+                Console.WriteLine("Song removed!");
+                Console.WriteLine(string.Join(", ", urls.Keys));
+            }
+            else
+            {
+                Console.WriteLine("This song doesn't exist in the list!");
+            }
+        }
+        static void TransferLinks(Dictionary<string, string> urls, string outputFile)
+        {
+            using (var writer = new StreamWriter(outputFile))
+            {
+                foreach (var item in urls)
+                {
+                    writer.WriteLine(item.Value);
+                }
+            }
+        }
+        static void SaveURL(Dictionary<string, string> urls)
+        {
+            Console.WriteLine("How many URLs are you going to save?");
+            var count = int.Parse(Console.ReadLine());
+            for (int i = 0; i < count; i++)
+            {
+                Console.WriteLine("Input URL: ");
+                var link = Console.ReadLine();
+                AddToDictionary(urls, link);
+                URLCount++;
+            }
+            Console.WriteLine(string.Join(", ", urls.Keys));
+        }
+        static void AddToDictionary(Dictionary<string, string> urls, string link)
+        {
+            var key = Convert.ToString(URLCount);
+            if (!urls.ContainsKey(key))
+            {
+                urls[key] = link;
+            }
+            else
+            {
+                Console.WriteLine("Song already exists in the list!");
+            }
+        }
+        static void OpenUrl(Dictionary<string, string> urls)
+        {
+            Console.WriteLine("Which song do you want to play? Type the number:");
+            var input = Console.ReadLine();
+            var url = string.Empty;
+            foreach (var item in urls)
+            {
+                if (item.Key == input)
+                {
+                    url = item.Value;
+                    break;
+                }
+            }
+            try
+            {
+                Process.Start(url);
+            }
+            catch
+            {
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    url = url.Replace("&", "^&");
+                    Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+                }
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                {
+                    Process.Start("xdg-open", url);
+                }
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                {
+                    Process.Start("open", url);
+                }
+                else
+                {
+                    throw;
+                }
+            }
+        }
+    }
+}
