@@ -1,0 +1,88 @@
+using System.Numerics;
+
+namespace ShootingDIstance
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            var target = new string[5, 5];
+
+            for (int r = 0; r < target.GetLength(0); r++)
+            {
+                for (int c = 0; c < target.GetLength(1); c++)
+                {
+                    target[r, c] = "-";
+                }
+            }
+
+            // When a projectile is fired over long distances, gravity alters its path. Good calculations can be the difference between
+            // a successful hit or mission failure
+
+            // A fired bullet falls with 9.8m/s, each second falling with additional 9.8m/s. So if it traveled for 2s, it would've changed it's
+            // trajectory by 19.6 meters. 
+
+            // The mass and speed of the bullet also matters. We'll be using a 9mm bullet. Its speed when fired is roughly 1320km/h and its weight is
+            // roughly 8 grams. The law of inertia states that once in motion a body will always be in motion, no matter of it's mass. Let's say a 9mm bullet 
+            // is fired with 1320km/h at a target which is 300m away. The bullet is traveling with 365m/s, each millisecond the bullet falls with 9.8 millimeters. 
+            // The bullet reaches the target in 0.8 seconds, or 800 milliseconds, so the bullet deviated from the target by roughly 8m. 
+
+            //This calculates the deviation for a 9mm bullet which will occur for the distance it has to traverse to reach the target.
+
+            var targetDistance = double.Parse(Console.ReadLine());
+
+            var time = targetDistance / 365;
+
+            double deviation = ((time * 1000) * 9.8) / 1000;
+
+            Console.WriteLine($"The bullet will fall down by {deviation:f2}m from it's original trajectory");
+
+            // Now let's shoot at the target. Let's say you're the best shot in the wild west and you always hit in the center, no matter
+            // the wind speed or temperature. But gravity is your kryptonite. The target is 2m high. I made it easy for you with giving you 
+            // the answer beforehand. Feel free to comment the console.writeline part so you can guess on your own. 
+
+            var aimUpDistance = double.Parse(Console.ReadLine());
+
+            if (deviation > aimUpDistance)
+            {
+                if (deviation - aimUpDistance > 2 && deviation - aimUpDistance > -2)
+                {
+                    Console.WriteLine("Target Missed!");
+                }
+                else 
+                {
+                    Hit(target);
+                }
+            }
+            else
+            {
+                if (aimUpDistance - deviation > 2 && aimUpDistance - deviation > -2)
+                {
+                    Console.WriteLine("Target Missed!");
+                }
+                else
+                {
+                    Hit(target);
+                }
+            }
+
+        }
+        static void Hit(string[,] matrix)
+        {
+            matrix[2, 2] = "X";
+            Print(matrix);
+        }
+        static void Print(string[,] matrix)
+        {
+            
+            for (int r = 0; r < matrix.GetLength(0); r++)
+            {
+                for (int c = 0; c < matrix.GetLength(1); c++)
+                {
+                    Console.Write(matrix[r, c]);
+                }
+                Console.WriteLine();
+            }
+        }
+    }
+}
