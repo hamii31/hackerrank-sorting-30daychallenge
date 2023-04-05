@@ -1,0 +1,125 @@
+
+
+namespace GuidanceSystem
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            // A missile knows where it is and where it is must go at all times. 
+
+            var currentPosition = 0;
+            var target = 20;
+
+            // To reach the target, the missile must reach where it is not currently, while still knowing where it has been, all the while trying to reach it's target
+
+            RocketToTarget();
+
+            // What happens when the target changes it's position? The missile must underdstand the change of it's target's and it's own trajectory and fix it's course accordingly
+
+            TargetDoesManuevers();
+            
+        }
+        static void RocketToTarget()
+        {
+            var matrix = new string[5, 5];
+
+            var targetRow = 0;
+            var targetCol = 0;
+
+            for (int r = 0; r < matrix.GetLength(0); r++)
+            {
+                for (int c = 0; c < matrix.GetLength(1); c++)
+                {
+                    if (r == 0 && c == 2)
+                    {
+                        matrix[r, c] = "R";
+                    }
+                    else if (r == 4 && c == 2)
+                    {
+                        matrix[r, c] = "T";
+                        targetRow = r;
+                        targetCol = c;
+                    }
+                    else
+                    {
+                        matrix[r, c] = "-";
+                    }
+                }
+            }
+            PrintMatrix(matrix, matrix.GetLength(0), matrix.GetLength(1));
+
+            Console.WriteLine();
+
+            for (int r = 0; r < matrix.GetLength(0); r++)
+            {
+                for (int c = 0; c < matrix.GetLength(1); c++)
+                {
+                    if (c == targetCol)
+                    {
+                        matrix[r, c] = "R";
+                    }
+                }
+            }
+
+            PrintMatrix(matrix, matrix.GetLength(0), matrix.GetLength(1));
+
+        }
+        static void PrintMatrix(string[,] matrix, int rows, int cols)
+        {
+            for (int r = 0; r < matrix.GetLength(0); r++)
+            {
+                for (int c = 0; c < matrix.GetLength(1); c++)
+                {
+                    Console.Write(matrix[r, c]);
+                }
+                Console.WriteLine();
+            }
+        }
+        static void TargetDoesManuevers()
+        {
+            var matrix = new string[10, 20];
+
+            var targetRow = 0;
+            var targetCol = 0;
+
+            for (int r = 0; r < matrix.GetLength(0); r++)
+            {
+                for (int c = 0; c < matrix.GetLength(1); c++)
+                {
+                    if (r == 0 && c == 4)
+                    {
+                        matrix[r, c] = "R";
+                    }
+                    else if (r == 9 && c == 4)
+                    {
+                        matrix[r, c] = "T";
+                        targetRow = r;
+                        targetCol = c;
+                    }
+                    else
+                    {
+                        matrix[r, c] = "-";
+                    }
+                }
+            }
+            PrintMatrix(matrix, matrix.GetLength(0), matrix.GetLength(1));
+
+            Console.WriteLine();
+
+            for (int r = 0; r < matrix.GetLength(0); r++)
+            {
+                targetCol++;
+                for (int c = 0; c < matrix.GetLength(1); c++)
+                {
+                    matrix[targetRow, targetCol] = "T";
+                    if (c == targetCol)
+                    {
+                        matrix[r, c] = "R";
+                    }
+                }
+            }
+            PrintMatrix(matrix, matrix.GetLength(0), matrix.GetLength(1));
+        }
+    }
+}
