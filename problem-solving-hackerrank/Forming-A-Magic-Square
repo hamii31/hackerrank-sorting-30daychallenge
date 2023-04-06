@@ -1,0 +1,234 @@
+
+
+public class Solution
+{
+    public string[] _matrix;
+    public List<string[]> _possibleSquares;
+
+    public enum SeqType
+    {
+        Row,
+        Col,
+        Diag
+    }
+
+    public static void Main(string[] args)
+    {
+        Solution p = new Solution();
+        p.Run(args);
+    }
+
+    public void Run(string[] args)
+    {
+        InitPossibleSquares();
+        //List<string> possibleSequences = GetPossibleSequences();
+
+        IInput input;
+
+        if (args.Length > 0)
+        {
+            input = new StringInput(System.IO.File.ReadAllLines(args[0]));
+        }
+        else
+        {
+            input = new ConsoleInput();
+        }
+
+        _matrix = new string[3];
+        CreateMatrixRow(0, input.ReadLine());
+        CreateMatrixRow(1, input.ReadLine());
+        CreateMatrixRow(2, input.ReadLine());
+
+        int minSum = int.MaxValue;
+        foreach (var square in _possibleSquares)
+        {
+            int totSum = 0;
+            for (int i = 0; i < 3; i++)
+                for (int j = 0; j < 3; j++)
+                {
+                    int sum = square[i][j] - _matrix[i][j];
+
+                    if (sum < 0)
+                        sum *= -1;
+
+                    totSum += sum;
+                }
+            if (minSum > totSum)
+                minSum = totSum;
+        }
+
+        Console.WriteLine(minSum);
+    }
+
+    public void InitPossibleSquares()
+    {
+        _possibleSquares = new List<string[]>
+        {
+            new []
+            {
+            "276",
+            "951",
+            "438",
+            },
+
+            new []
+            {
+            "294",
+            "753",
+            "618",
+            },
+
+            new []
+            {
+            "438",
+            "951",
+            "276",
+            },
+
+            new []
+            {
+            "492",
+            "357",
+            "816",
+            },
+
+            new []
+            {
+            "618",
+            "753",
+            "294",
+            },
+
+            new []
+            {
+            "672",
+            "159",
+            "834",
+            },
+
+            new []
+            {
+            "816",
+            "357",
+            "492",
+            },
+
+            new []
+            {
+            "834",
+            "159",
+            "672",
+            }
+        };
+    }
+
+    public bool IsMagic()
+    {
+        int sum = Sum("195");
+
+        for (int i = 0; i < 3; i++)
+        {
+            if (Sum(GetSequence(SeqType.Row, i)) != sum)
+                return false;
+
+            if (Sum(GetSequence(SeqType.Col, i)) != sum)
+                return false;
+
+            if (i < 2 && Sum(GetSequence(SeqType.Diag, i)) != sum)
+                return false;
+        }
+
+        bool[] num = new bool[9];
+
+        for (int i = 0; i < 3; i++)
+            for (int j = 0; j < 3; j++)
+            {
+                int idx = _matrix[i][j] - '0' - 1;
+                if (num[idx])
+                    return false;
+                num[idx] = true;
+            }
+        return true;
+    }
+
+    public int Sum(string seq)
+    {
+        return (int)seq[0] + (int)seq[1] + (int)seq[2];
+    }
+
+    public void CreateMatrixRow(int row, string input)
+    {
+        string rowStr = $"{input[0]}{input[2]}{input[4]}";
+        _matrix[row] = rowStr;
+    }
+
+    public string GetSequence(SeqType seq, int n)
+    {
+        switch (seq)
+        {
+            case SeqType.Row:
+                return _matrix[n];
+
+            case SeqType.Col:
+                return $"{_matrix[0][n]}{_matrix[1][n]}{_matrix[2][n]}";
+
+            default:
+                if (n == 0)
+                    return $"{_matrix[0][0]}{_matrix[1][1]}{_matrix[2][2]}";
+                else
+                    return $"{_matrix[0][2]}{_matrix[1][1]}{_matrix[2][0]}";
+        }
+    }
+
+    public List<string> GetPossibleSequences()
+    {
+        List<string> p = new List<string>();
+
+        for (int i = 1; i < 10; i++)
+            for (int j = 1; j < 10; j++)
+                for (int k = 1; k < 10; k++)
+                {
+                    if (i == j || i == k || j == k)
+                        continue;
+
+                    if (i + j + k != 15)
+                        continue;
+
+                    p.Add($"{i}{j}{k}");
+                }
+
+        return p;
+    }
+
+    public interface IInput
+    {
+        string ReadLine();
+    }
+
+    public class ConsoleInput : IInput
+    {
+        public string ReadLine()
+        {
+            return Console.ReadLine();
+        }
+    }
+
+    public class StringInput : IInput
+    {
+        IEnumerable<string> _data;
+        IEnumerator<string> _dataEnumerator;
+
+        public StringInput(IEnumerable<string> data)
+        {
+            _data = data;
+            _dataEnumerator = _data.GetEnumerator();
+        }
+
+        public string ReadLine()
+        {
+            _dataEnumerator.MoveNext();
+            var retVal = _dataEnumerator.Current;
+            return retVal;
+        }
+    }
+}
