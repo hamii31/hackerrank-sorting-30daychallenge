@@ -1,3 +1,17 @@
+using System.CodeDom.Compiler;
+using System.Collections.Generic;
+using System.Collections;
+using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.Serialization;
+using System.Text.RegularExpressions;
+using System.Text;
+using System;
+
 class Result
 {
 
@@ -10,53 +24,37 @@ class Result
 
      public static int pickingNumbers(List<int> a)
     {
-        var subArr = new Stack<int>();
-        var maxLength = subArr.Count;
-        for (int i = 0; i < a.Count; i++)
+         var maxLength = 0;
+        var subList = a.OrderBy(x => x).ToList();
+
+        for (int i = 0; i < subList.Count; i++)
         {
-            subArr.Push(a[i]);
-            for (int j = i; j < a.Count - 1; j++)
+            var current = 1;
+            if (i > 0)
             {
-                if (subArr.Peek() - a[j + 1] <= 1 || subArr.Peek() - a[j + 1] <= -1)
+                if (subList[i] == subList[i - 1])
                 {
-                    if (Addable(subArr, a[j + 1]))
-                    {
-                        subArr.Push(a[j + 1]);
-                    }
+                    continue;
                 }
             }
-            if (subArr.Count > maxLength)
+            for (int j = i + 1; j < subList.Count; j++)
             {
-                maxLength = subArr.Count;
+                if (Math.Abs(subList[j] - subList[i]) <= 1)
+                {
+                    current++;
+                }
+                else
+                {
+                    break;
+                }
             }
-
-            subArr.Clear();
+            if (current > maxLength)
+            { 
+                maxLength = current;
+            }
         }
-        
         return maxLength;
     }
-    static bool Addable(Stack<int> a, int b)
-    {
-        var addable = false;
-        var stackList = a.ToList();
-
-        for (int n = 0; n < a.Count; n++)
-        {
-            if (stackList[n] - b > 1 || stackList[n] - b < -1)
-            {
-                addable = false;
-                break;
-            }
-            else
-            {
-                addable = true;
-            }
-        }
-        stackList.Clear();
-        return addable;
-    }
-
-
 }
 
 class Solution
