@@ -28,10 +28,9 @@ class Result
     {
         List<int> result = new List<int>();
         List<int> nodupesRanked = ranked.Distinct().ToList();
-        List<NumberRank> numberrank = nodupesRanked.OrderByDescending(n => n)
+        List<NumberRank> numberrank = nodupesRanked
             .Select((n, i) => new NumberRank(n, i + 1)).ToList();
 
-       
         for (int i = 0; i < player.Count; i++)
         {
             var repeater = 0;
@@ -54,7 +53,7 @@ class Result
                 result.Add(numberrank.Count + 1);
             }
         }
-        //foreach (var item in numberrank) -> to see ranking
+        //foreach (var item in numberrank)
         //{
         //    Console.WriteLine("{0} : {1}", item.Rank, item.Number);
         //}
