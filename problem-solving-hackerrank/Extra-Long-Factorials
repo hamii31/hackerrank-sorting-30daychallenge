@@ -1,0 +1,31 @@
+using System.Numerics;
+
+class Result
+{
+
+    /*
+     * Complete the 'extraLongFactorials' function below.
+     *
+     * The function accepts INTEGER n as parameter.
+     */
+
+    public static void extraLongFactorials(int n)
+    {
+        var sum = BigInteger.One;
+        for (int i = 1; i <= n; i++)
+            sum = sum * i;
+
+        Console.WriteLine(sum);
+    }
+
+}
+
+class Solution
+{
+    public static void Main(string[] args)
+    {
+        int n = Convert.ToInt32(Console.ReadLine().Trim());
+
+        Result.extraLongFactorials(n);
+    }
+}
