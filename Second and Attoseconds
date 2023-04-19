@@ -1,0 +1,22 @@
+using System.Diagnostics;
+using System.Numerics;
+
+namespace Attoseconds_Calculator
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            DateTime time = DateTime.Now;
+            Stopwatch s = Stopwatch.StartNew();
+            while (time.Ticks < 10000)
+            {
+            }
+            var second = time.Ticks / 10000;
+            s.Stop();
+            var attos = BigInteger.One;
+            attos = second * (10 ^ 18);
+            Console.WriteLine($"While a second passes {attos:f0} attoseconds have already passed");
+        }
+    }
+}
