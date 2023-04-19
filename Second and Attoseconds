@@ -9,14 +9,14 @@ namespace Attoseconds_Calculator
         {
             DateTime time = DateTime.Now;
             Stopwatch s = Stopwatch.StartNew();
-            while (time.Ticks < 10000)
+            while (time.Ticks <= 10000)
             {
             }
-            var second = time.Ticks / 10000;
+            var second = time.Ticks / 1000;
             s.Stop();
             var attos = BigInteger.One;
             attos = second * (10 ^ 18);
-            Console.WriteLine($"While a second passes {attos:f0} attoseconds have already passed");
+            Console.WriteLine($"While the code counts 10 000 ticks (= 1 second) {attos:f0} attoseconds have already passed");
         }
     }
 }
