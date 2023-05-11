@@ -1,0 +1,108 @@
+using System.CodeDom.Compiler;
+using System.Collections.Generic;
+using System.Collections;
+using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.Serialization;
+using System.Text.RegularExpressions;
+using System.Text;
+using System;
+
+class Result
+{
+
+    /*
+     * Complete the 'kaprekarNumbers' function below.
+     *
+     * The function accepts following parameters:
+     *  1. INTEGER p
+     *  2. INTEGER q
+     */
+
+    public static void kaprekarNumbers(int p, int q)
+    {
+        var check = false;
+        List<int> res = new List<int>();
+        for (int i = p; i <= q; i++)
+        {
+            if (Calculations(i) || i == 1)
+            {
+                res.Add(i);
+                check = true;
+            }     
+        }
+        if (!check)
+        {
+            Console.WriteLine("INVALID RANGE");
+        }
+        else
+        {
+            Console.WriteLine(string.Join(" ", res));
+        }
+    }
+    public static bool Calculations(int n)
+    {
+        var d = n.ToString().Length;
+        var num = Math.Pow(n, 2);
+        if (num - 10 < 0)
+        {
+            return false;
+        }
+        else
+        {
+            long a = 0;
+            long b = 0;
+            if (d == 1)
+            {
+                a = (int)num / 10;
+                b = (int)num % 10;
+            }
+            if (d == 2)
+            {
+                a = (int)num / 100;
+                b = (int)num % 100;
+            }
+            if (d == 3)
+            {
+                a = (int)num / 1000;
+                b = (int)num % 1000;
+            }
+            if (d == 4)
+            {
+                a = (int)num / 10000;
+                b = (int)num % 10000;
+            }
+            if (d == 5)
+            {
+                a = (long)num / 100000;
+                b = (long)num % 100000;
+            }
+            var sum = a + b;
+            if (sum == n)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+    }
+
+}
+
+class Solution
+{
+    public static void Main(string[] args)
+    {
+        int p = Convert.ToInt32(Console.ReadLine().Trim());
+
+        int q = Convert.ToInt32(Console.ReadLine().Trim());
+
+        Result.kaprekarNumbers(p, q);
+    }
+}
