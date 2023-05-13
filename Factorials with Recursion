@@ -1,0 +1,25 @@
+namespace Recursiion
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            long fact;
+            Console.WriteLine("Enter number:");
+            long num = int.Parse(Console.ReadLine());
+            fact = Factorial(num);
+            Console.WriteLine($"Factorial of {num} is {fact}");
+        }
+        static long Factorial(long num)
+        {
+            if (num == 0)
+            {
+                return 1;
+            }
+            else
+            {
+                return num * Factorial(num - 1);
+            }
+        }
+    }
+}
