@@ -1,0 +1,199 @@
+using System.Numerics;
+
+namespace HeartForBubo
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            var matri = new string[10, 14];
+            for (int i = 0; i < 10; i++)
+            {
+                for (int j = 0; j < 14; j++)
+                {
+                    if (i == 0 || i == 9)
+                    {
+                        matri[i, j] = "I";
+                    }
+                    else if (j == 6)
+                    {
+                        matri[i, j] = "I";
+                    }
+                    else
+                    {
+                        matri[i, j] = " ";
+                    }
+                }
+            }
+            for (int i = 0; i < 10; i++)
+            {
+                for (int j = 0; j < 14; j++)
+                {
+                    Console.Write(matri[i, j]);
+                }
+                Console.WriteLine();
+            }
+            Console.WriteLine();
+
+
+            var matrix = new string[10, 14];
+            for (int i = 0; i < 10; i++)
+            {
+                for (int j = 0; j < 14; j++)
+                {
+                    switch (i)
+                    {
+                        case 0:
+                            if (j == 3 || j == 10)
+                            {
+                                matrix[i, j] = "+";
+                            }
+                            else
+                            {
+                                matrix[i, j] = " ";
+                            }
+                            break;
+                        case 1:
+                            if (j == 2 || j == 3 ||
+                                j == 4 || j == 9 ||
+                                j == 10 || j == 11)
+                            {
+                                matrix[i, j] = "+";
+                            }
+                            else
+                            {
+                                matrix[i, j] = " ";
+                            }
+                            break;
+                        case 2:
+                            if (j == 1 || j == 2 || j == 3
+                                || j == 4 || j == 5 || j == 8
+                                || j == 9 || j == 10 || j == 11
+                                || j == 12)
+                            {
+                                matrix[i, j] = "+";
+                            }
+                            else
+                            {
+                                matrix[i, j] = " ";
+                            }
+                            break;
+                        case 3:
+                            matrix[i, j] = "+";
+                            break;
+                        case 4:
+                            if (j > 0 && j < 13)
+                            {
+                                matrix[i, j] = "+";
+                            }
+                            else
+                            {
+                                matrix[i, j] = " ";
+                            }
+                            break;
+                        case 5:
+                            if (j > 1 && j < 12)
+                            {
+                                matrix[i, j] = "+";
+                            }
+                            else
+                            {
+                                matrix[i, j] = " ";
+                            }
+                            break;
+                        case 6:
+                            if (j > 2 && j < 11)
+                            {
+                                matrix[i, j] = "+";
+                            }
+                            else
+                            {
+                                matrix[i, j] = " ";
+                            }
+                            break;
+                        case 7:
+                            if (j > 3 && j < 10)
+                            {
+                                matrix[i, j] = "+";
+                            }
+                            else
+                            {
+                                matrix[i, j] = " ";
+                            }
+                            break;
+                        case 8:
+                            if (j > 4 && j < 9)
+                            {
+                                matrix[i, j] = "+";
+                            }
+                            else
+                            {
+                                matrix[i, j] = " ";
+                            }
+                            break;
+                        case 9:
+                            if (j > 5 && j < 8)
+                            {
+                                matrix[i, j] = "+";
+                            }
+                            else
+                            {
+                                matrix[i, j] = " ";
+                            }
+                            break;
+                        case 10:
+                            if (j > 6 && j < 8)
+                            {
+                                matrix[i, j] = "+";
+                            }
+                            else
+                            {
+                                matrix[i, j] = " ";
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+            for (int i = 0; i < 10; i++)
+            {
+                for (int j = 0; j < 14; j++)
+                {
+                    Console.Write(matrix[i, j]);
+                }
+                Console.WriteLine();
+            }
+
+            var matr = new string[10, 14];
+
+            for (int i = 0; i < 10; i++)
+            {
+                for (int j = 0; j < 14; j++)
+                {
+                    if (i == 9)
+                    {
+                        matr[i, j] = "U";
+                    }
+                    else if (j == 0 || j == 13)
+                    {
+                        matr[i, j] = "U";
+                    }
+                    else
+                    {
+                        matr[i, j] = " ";
+                    }
+                }
+            }
+
+            for (int i = 0; i < 10; i++)
+            {
+                for (int j = 0; j < 14; j++)
+                {
+                    Console.Write(matr[i, j]);
+                }
+                Console.WriteLine();
+            }
+        }
+    }
+}
