@@ -11,6 +11,7 @@ namespace Algorithms
             BubbleSort();
             InsertionSort(); // slightly faster than bubble and selection sort
             SelectionSort();
+            QuickSort(); // uses recursion -> unstable
         }
         public static void LinearSearch()
         {
@@ -133,6 +134,52 @@ namespace Algorithms
             sp.Stop();
             Console.WriteLine(string.Join(", ", unsorted));
             Console.WriteLine(sp.Elapsed + " Selection Sort");
+        }
+        public static void QuickSort()
+        {
+            Stopwatch sp = new Stopwatch();
+            int[] unsorted = new int[] { 8, 5, 7, 3, 1, 4, 9, 10, 2, 6 };
+            static int[] Recursion(int[] unsorted, int l, int r)
+            {
+                var i = l;
+                var j = r;
+                var pivot = unsorted[l]; // pivot point always at the start of the arr
+                while (i <= j)
+                {
+                    while (unsorted[i] < pivot)
+                    {
+                        i++;
+                    }
+                    while (unsorted[j] > pivot)
+                    {
+                        j--;
+                    }
+                    if (i <= j)
+                    {
+                        var temp = unsorted[i];
+                        unsorted[i] = unsorted[j];
+                        unsorted[j] = temp;
+                        i++;
+                        j--;
+                    }
+                }
+                if (l < j)
+                {
+                    Recursion(unsorted, l, j);
+                }
+                if (r > i)
+                {
+                    Recursion(unsorted, i, r);
+                }
+                return unsorted;
+            }
+
+            sp.Start();
+            var sorted = Recursion(unsorted, 0, unsorted.Length - 1);
+            sp.Stop();
+
+            Console.WriteLine(string.Join(", ", sorted));
+            Console.WriteLine(sp.Elapsed + " Quick Sort");
         }
     }
 }
