@@ -1,0 +1,138 @@
+using System.Diagnostics;
+
+namespace Algorithms
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            LinearSearch();
+            BinarySearch(); // faster than linear
+            BubbleSort();
+            InsertionSort(); // slightly faster than bubble and selection sort
+            SelectionSort();
+        }
+        public static void LinearSearch()
+        {
+            Stopwatch sp = new Stopwatch();
+            int key = 10;
+            int[] arr = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+            sp.Start();
+            for (int i = 0; i < arr.Length; i++)
+            {
+                if (arr[i] == key)
+                {
+                    Console.WriteLine($"{key} is at index {i} in the array!");
+                    sp.Stop();
+                    Console.WriteLine(sp.Elapsed + " Linear Search");
+                }
+            }
+
+            // faster way?
+            sp.Restart();
+            int index = Array.IndexOf(arr, key);
+            Console.WriteLine($"{key} is at index {index} in the array!");
+            sp.Stop();
+            Console.WriteLine(sp.Elapsed);
+
+
+        }
+        public static void BinarySearch()
+        {
+            Stopwatch sp = new Stopwatch();
+            int key = 23;
+            int[] arr = new int[] { 2,5,8,12,16,23,38,56,72,91 };
+            var l = 0;
+            var r = arr.Length;
+            sp.Start();
+            while (l <= r)
+            {
+                var x = l + r / 2;
+                if (arr[x] == key)
+                {
+                    Console.WriteLine($"{key} is at index {x} of array!");
+                    sp.Stop();
+                    Console.WriteLine(sp.Elapsed + " Binary Search");
+                    break;
+                }
+                if (arr[x] < key)
+                {
+                    l = x + 1;
+                }
+                else 
+                {
+                    r = x - 1;
+                }
+            }
+        }
+        public static void BubbleSort()
+        {
+            Stopwatch sp = new Stopwatch();
+            int[] unsorted = new int[] { 8, 5, 7, 3, 1, 4, 9, 10, 2, 6 };
+            sp.Start();
+            for (int i = 0; i <= unsorted.Length- 2; i++)
+            {
+                for (int j = 0; j <= unsorted.Length-2; j++)
+                {
+                    if (unsorted[j] > unsorted[j + 1])
+                    {
+                        var temp = unsorted[j + 1];
+                        unsorted[j + 1] = unsorted[j];
+                        unsorted[j] = temp;
+                    }
+                }
+            }
+            sp.Stop ();
+            Console.WriteLine(string.Join(", ", unsorted));
+            Console.WriteLine(sp.Elapsed + " Bubble Sort");
+        }
+        public static void InsertionSort()
+        {
+            Stopwatch sp = new Stopwatch();
+            int[] unsorted = new int[] { 8, 5, 7, 3, 1, 4, 9, 10, 2, 6 };
+            sp.Start();
+            for (int i = 1; i <= unsorted.Length - 1; i++)
+            {
+                var key = unsorted[i];
+                var j = i - 1;
+                while (j >= 0 && unsorted[j] > key)
+                {
+                    var temp = unsorted[j + 1];
+                    unsorted[j + 1] = unsorted[j];
+                    unsorted[j] = temp;
+                    j = j - 1;
+                }
+            }
+            sp.Stop();
+            Console.WriteLine(string.Join(", ", unsorted));
+            Console.WriteLine(sp.Elapsed + " Insertion Sort");
+        }
+        public static void SelectionSort()
+        {
+            Stopwatch sp = new Stopwatch();
+            int[] unsorted = new int[] { 8, 5, 7, 3, 1, 4, 9, 10, 2, 6 };
+            var min = int.MinValue;
+            sp.Start();
+            for (int i = 0; i < unsorted.Length - 1; i++)
+            {
+                min = i;
+                for (int j = i + 1; j < unsorted.Length; j++)
+                {
+                    if (unsorted[j] < unsorted[min])
+                    {
+                        min = j; // keeps track of minimal value throughout the loops
+                    }
+                }
+                if (min != i)
+                {
+                    var temp = unsorted[i];
+                    unsorted[i] = unsorted[min];
+                    unsorted[min] = temp;
+                }
+            }
+            sp.Stop();
+            Console.WriteLine(string.Join(", ", unsorted));
+            Console.WriteLine(sp.Elapsed + " Selection Sort");
+        }
+    }
+}
