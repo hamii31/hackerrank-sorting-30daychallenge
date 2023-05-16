@@ -1,0 +1,98 @@
+namespace ConsoleApp1
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            var time = DateTime.Now;
+            var hour = time.Hour;
+            var minute = time.Minute;
+            var second = time.Second;
+            while (true)
+            {
+                for (int h = 0; h < 12; h++)
+                {
+                    for (int m = 0; m < 60; m++)
+                    {
+                        for (int i = 0; i < 60; i++)
+                        {
+                            if (second < 10)
+                            {
+                                if (minute < 10)
+                                {
+                                    Console.WriteLine($"Time is {hour}:0{minute}:0{second}");
+                                    Thread.Sleep(1000);
+                                    if (hour < 10)
+                                    {
+                                        Console.WriteLine($"Time is 0{hour}:0{minute}:0{second}");
+                                        Thread.Sleep(1000);
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine($"Time is {hour}:0{minute}:0{second}");
+                                        Thread.Sleep(1000);
+                                    }
+                                }
+                                else
+                                {
+                                    if (hour < 10)
+                                    {
+                                        Console.WriteLine($"Time is 0{hour}:{minute}:0{second}");
+                                        Thread.Sleep(1000);
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine($"Time is {hour}:{minute}:0{second}");
+                                        Thread.Sleep(1000);
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                if (minute < 10)
+                                {
+                                    if (hour < 10)
+                                    {
+                                        Console.WriteLine($"Time is 0{hour}:0{minute}:{second}");
+                                        Thread.Sleep(1000);
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine($"Time is {hour}:0{minute}:{second}");
+                                        Thread.Sleep(1000);
+                                    }
+                                }
+                                else
+                                {
+                                    if (hour < 10)
+                                    {
+                                        Console.WriteLine($"Time is 0{hour}:{minute}:{second}");
+                                        Thread.Sleep(1000);
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine($"Time is {hour}:{minute}:{second}");
+                                        Thread.Sleep(1000);
+                                    }
+                                }
+                            }
+                            second++;
+                            if (second == 60)
+                            {
+                                second = 0;
+                                break;
+                            }
+                        }
+                        minute++;
+                        if (minute == 60)
+                        {
+                            minute = 0;
+                            break;
+                        }
+                    }
+                    hour++;
+                }
+            }
+        }
+    }
+}
