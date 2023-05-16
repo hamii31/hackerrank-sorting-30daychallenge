@@ -13,6 +13,7 @@ namespace Algorithms
             SelectionSort();
             QuickSort(); // uses recursion -> unstable, good for a lot of data, less complex than merge sort
             MergeSort(); // uses recursion, good for a lot of data
+            HeapSort(); 
         }
         public static void LinearSearch()
         {
@@ -244,6 +245,61 @@ namespace Algorithms
             Console.WriteLine(string.Join(", ", sorted));
             Console.WriteLine(sp.Elapsed + " Merge Sort");
         }
+        public static void HeapSort()
+        {
+            Stopwatch sp = new Stopwatch();
+            int[] unsorted = new int[] { 8, 5, 7, 3, 1, 4, 9, 10, 2, 6, 11, 15, 13, 12, 14, 20, 16, 19, 17, 18 };
+            sp.Start();
+            var sorted = SortArray(unsorted, unsorted.Length);
+            sp.Stop();
+
+            static int[] SortArray(int[] array, int size)
+            {
+                if (size <= 1)
+                {
+                    return array;
+                }
+                for (int i = (size / 2) - 1; i >= 0; i--)
+                {
+                    Heapify(array, size, i);
+                }
+
+                for (int i = size - 1; i >= 0; i--)
+                {
+                    var temp = array[0];
+                    array[0] = array[i];
+                    array[i] = temp;
+
+                    Heapify(array, i, 0);
+                }
+                return array;
+            }
+            static void Heapify(int[] array, int size, int index)
+            {
+                var largestIndex = index; // set index of the maximum element to the current array index
+                var leftChild = 2 * index + 1; // implementing left child
+                var rightChild = 2 * index + 2; // implementing right child
+
+                if (leftChild < size && array[leftChild] > array[largestIndex]) // check if left child > root ? root = left child
+                {
+                    largestIndex = leftChild;
+                }
+                if (rightChild < size && array[rightChild] > array[largestIndex]) // check if the right child > root
+                {
+                    largestIndex = rightChild;
+                }
+                if (largestIndex != index) // if the max index is != index ? switch places and recursively call upon the function 
+                {
+                    var tempVar = array[index];
+                    array[index] = array[largestIndex];
+                    array[largestIndex] = tempVar;
+
+                    Heapify(array, size, largestIndex);
+                }
+            }
+            Console.WriteLine(string.Join(", ", sorted));
+            Console.WriteLine(sp.Elapsed + " Heap Sort");
+        } // creates a binary heap structure (binary tree) from the elements that need to be sorted
         
     }
 }
