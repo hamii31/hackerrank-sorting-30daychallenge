@@ -11,7 +11,8 @@ namespace Algorithms
             BubbleSort();
             InsertionSort(); // slightly faster than bubble and selection sort
             SelectionSort();
-            QuickSort(); // uses recursion -> unstable
+            QuickSort(); // uses recursion -> unstable, good for a lot of data, less complex than merge sort
+            MergeSort(); // uses recursion, good for a lot of data
         }
         public static void LinearSearch()
         {
@@ -181,5 +182,68 @@ namespace Algorithms
             Console.WriteLine(string.Join(", ", sorted));
             Console.WriteLine(sp.Elapsed + " Quick Sort");
         }
+        public static void MergeSort()
+        {
+            Stopwatch sp = new Stopwatch();
+            int[] unsorted = new int[] { 8, 5, 7, 3, 1, 4, 9, 10, 2, 6, 11, 15, 13, 12, 14, 20, 16, 19, 17, 18 };
+            sp.Start();
+            var sorted = SortArray(unsorted, 0, unsorted.Length - 1);
+            sp.Stop();
+
+            static int[] SortArray(int[] array, int left, int right)
+            {
+                if (left < right)
+                {
+                    int middle = left + (right - left) / 2;
+                    SortArray(array, left, middle);
+                    SortArray(array, middle + 1, right);
+
+                    Merge(array, left, middle, right);
+                }
+                return array;
+            }
+            static void Merge(int[] array, int left, int middle, int right)
+            {
+                var leftArrayLength = middle - left + 1; 
+                var rightArrayLength = right - middle;
+                var leftTempArray = new int[leftArrayLength]; // defining temporary arrays to hold data during the sorting process
+                var rightTempArray = new int[rightArrayLength];
+                
+                int i, j;
+
+                for (i = 0; i < leftArrayLength; ++i) // copying data into said temp arrays
+                    leftTempArray[i] = array[left + i];
+                for (j = 0; j < rightArrayLength; ++j)
+                    rightTempArray[j] = array[middle + 1 + j];
+
+                i = 0;
+                j = 0;
+
+                int k = left;
+
+                while (i < leftArrayLength && j < rightArrayLength) // sorting and merging 
+                {
+                    if (leftTempArray[i] <= rightTempArray[j])
+                    {
+                        array[k++] = leftTempArray[i++];
+                    }
+                    else
+                    {
+                        array[k++] = rightTempArray[j++];
+                    }
+                }
+                while (i < leftArrayLength) // copying any remaining elements 
+                {
+                    array[k++] = leftTempArray[i++];
+                }
+                while (j < rightArrayLength)
+                {
+                    array[k++] = rightTempArray[j++];
+                }
+            }
+            Console.WriteLine(string.Join(", ", sorted));
+            Console.WriteLine(sp.Elapsed + " Merge Sort");
+        }
+        
     }
 }
