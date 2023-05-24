@@ -1,0 +1,13 @@
+namespace CountDuplicates
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            string str = "aAAHHhshdauaslAJSKJDAJkskSKADJIOAHSDHAKLlkksaklfklasnkjAJDKLASHDLKAHL";
+            char[] arr = str.ToUpper().ToArray(); // remove ToUpper() to showcase lowercase letters count too
+            var q = arr.GroupBy(x => x).Select(g => new { Letter = g.Key, Count = g.Count() }).OrderByDescending(x => x.Count);
+            Console.WriteLine(string.Join("; ", q));
+        }
+    }
+}
