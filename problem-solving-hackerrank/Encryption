@@ -1,0 +1,64 @@
+using System.CodeDom.Compiler;
+using System.Collections.Generic;
+using System.Collections;
+using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.Serialization;
+using System.Text.RegularExpressions;
+using System.Text;
+using System;
+using System.ComponentModel.Design.Serialization;
+
+class Solution
+{
+    public static void Main(string[] args)
+    { 
+        string s = Console.ReadLine();
+
+        s = s.Replace(" ", "");
+        var length = s.ToCharArray().Count();
+        var row = Math.Floor(Math.Sqrt(length));
+        var col = Math.Ceiling(Math.Sqrt(length));
+        if (row * col < length)
+        {
+            while (row * col < length)
+            {
+                row += 1;
+            }
+        }
+        char[,] matrix = new char[(int)row, (int)col];
+        var startIndex = 0;
+        var lengthOfCut = (int)col;
+        for (int r = 0; r < row; r++)
+        {
+            if (startIndex + (int)col > length)
+            {
+                lengthOfCut -= (startIndex + (int)col) - length;
+            }
+            var partOfS = s.Substring(startIndex, lengthOfCut);
+
+            for (int c = 0; c < lengthOfCut; c++)
+            {
+                matrix[r, c] = partOfS[c];
+            }
+            startIndex += (int)col;
+        }
+        var res = "";
+        for (int c = 0; c < matrix.GetLength(1); c++)
+        {
+            for (int r = 0; r < matrix.GetLength(0); r++)
+            {
+                if (matrix[r, c] != '\0')
+                {
+                    res += matrix[r, c];
+                }
+            }
+            res += " ";
+        }
+        Console.WriteLine(res);
+    }
+}
