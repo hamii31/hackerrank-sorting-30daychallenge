@@ -30,7 +30,7 @@ class Result
         for(int i = 0; i < cases.Count; i ++)
         {
             var range = cases[i][1] - cases[i][0];
-            var smallest = width.GetRange(cases[i][0] == 0 ? 0 : cases[i][0], range + cases[i][0] >= width.Count ? range : range + 1).Min();
+            var smallest = width.GetRange(cases[i][0], range + cases[i][0] >= width.Count ? range : range + 1).Min();
             res.Add(smallest);
         }
         return res;
