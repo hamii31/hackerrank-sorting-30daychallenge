@@ -1,0 +1,31 @@
+namespace FourLeafClover
+{
+	internal class Program
+	{
+		static void Main(string[] args)
+		{
+			//one four-leaf clover for every 5,076 three-leaf clover
+			//776 000 seeds per 450g
+			//675 m2 per 450g
+			//worst case scenario is 50% unsuccessful growth from seeds
+
+			//for 675m2 you'll get 776 000 / 2 (worst case scenario) = 388 000
+
+			Console.Write("Enter area (m2): ");
+			int m2 = int.Parse(Console.ReadLine());
+			double seedsPerM2 = 776000 / 675;
+			double totalClovers = (m2 * seedsPerM2) / 2; // worst case scenario 
+			double fourLeafClovers = totalClovers / 5076;
+			Console.Write($"Out of {totalClovers:f0} clovers in a {m2} m2 field, there");
+			if (fourLeafClovers > 1)
+			{
+				Console.Write($" are {Math.Floor(fourLeafClovers)} four-leaf clovers");
+			}
+			else
+			{
+				Console.Write($" is {Math.Floor(fourLeafClovers)} four-leaf clovers");
+			}
+			Console.WriteLine();
+		}
+	}
+}
