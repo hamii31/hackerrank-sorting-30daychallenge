@@ -10,9 +10,9 @@ namespace CartesianProductPairCalculator
             {
                 1,2,3,4,5,6,
             };
-            List<int> b = new List<int>()
+            List<string> b = new List<string>()
             {
-                2,3,4,5,6,7,8
+                "b", "u", "m", "e", "s", "e"
             };
 
             (StringBuilder aXb, int pairs) = PairCalculator(a, b);
@@ -23,7 +23,7 @@ namespace CartesianProductPairCalculator
 
             Console.WriteLine("Total pairs in the Cartesian product: " + pairs);
         }
-        public static Tuple<StringBuilder, int> PairCalculator(List<int> a, List<int> b)
+        public static Tuple<StringBuilder, int> PairCalculator(List<int> a, List<string> b)
         {
             StringBuilder CP = new StringBuilder();
             int pairs = 0;
@@ -32,7 +32,7 @@ namespace CartesianProductPairCalculator
             {
                 for (int r = 0; r < b.Count; r++)
                 {
-                    CP.Append("[" + a[i].ToString() + "," + b[r].ToString() + "]; ");
+                    CP.Append("[" + a[i].ToString() + "," + b[r]+ "]; ");
                     pairs++;
                 }
                 CP.AppendLine();
